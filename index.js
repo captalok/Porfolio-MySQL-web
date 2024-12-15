@@ -74,6 +74,14 @@ app.get("/user/expenses", (req,res) => {
     }
 });
 
+//================Git Commands =================
+//git clone link to the repository
+//git status
+//git push .
+//git commit -m"changes made"
+//git push origin main
+
+//===============================================
 
 // ===================== update route ================
 // 1. form from GET request
