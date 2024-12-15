@@ -58,15 +58,31 @@ app.get("/user/calendar", (req,res) => {
     }
 });
 
+app.get("/user/expenses", (req,res) => {
+
+    let q = 'SELECT * FROM portfoliomysql.run_expenses_entry;';
+
+    try {
+        connection.query(q,(err,database) => {
+            if (err) throw err;
+            res.render("expenses.ejs",{database});
+            
+        });
+        
+    } catch (err) {
+        console.log(err);
+    }
+});
+
 
 // ===================== update route ================
 // 1. form from GET request
 // 2. update from PATCH request
 
-app.get("/user/calendar/edit", (req,res) => {
-    res.render("edit.ejs");
-});
+// app.get("/user/calendar/edit", (req,res) => {
+//     res.render("edit.ejs");
+// });
 
-app.patch("/user", (req,res) => {
+// app.patch("/user", (req,res) => {
     
-});
+// });
