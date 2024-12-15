@@ -23,7 +23,7 @@ app.use(methodOverride("_method"));
 app.use(express.urlencoded({extended : true}));
 
 app.set("view engine", "ejs");
-// app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "views"));
 
 app.set(express.static(path.join(__dirname, "public")));
 app.use(express.static('public'));
@@ -68,6 +68,5 @@ app.get("/user/calendar/edit", (req,res) => {
 });
 
 app.patch("/user", (req,res) => {
-
-
+    
 });
