@@ -13,7 +13,7 @@ const mysql = require ("mysql2");
 const connection = mysql.createConnection({
     host : "localhost",
     user : "root",
-    database : "universalportfolio",
+    database : "portfoliomysql",
     password : "&&Alok&&24"
 });
 
@@ -60,7 +60,7 @@ app.get("/user/calendar", (req,res) => {
 
 app.get("/user/expenses", (req,res) => {
 
-    let q = 'SELECT * FROM portfoliomysql.run_expenses_entry;';
+    let q = 'SELECT * FROM run_expenses_entry;';
 
     try {
         connection.query(q,(err,database) => {
@@ -74,6 +74,37 @@ app.get("/user/expenses", (req,res) => {
     }
 });
 
+app.get("/user/all_trades", (req,res) => {
+
+    let q = 'SELECT * FROM all_trades;';
+
+    try {
+        connection.query(q,(err,database) => {
+            if (err) throw err;
+            res.render("all_trades.ejs",{database});
+            
+        });
+        
+    } catch (err) {
+        console.log(err);
+    }
+});
+
+app.get("/user/profit_loss", (req,res) => {
+
+    let q = 'SELECT * FROM combined_profit_loss;';
+
+    try {
+        connection.query(q,(err,database) => {
+            if (err) throw err;
+            res.render("ProfitLoss.ejs",{database});
+            
+        });
+        
+    } catch (err) {
+        console.log(err);
+    }
+});
 //================Git Commands =================
 //git clone link to the repository
 //git status
@@ -81,7 +112,8 @@ app.get("/user/expenses", (req,res) => {
 //git commit -m"changes made"
 //git push origin main
 
-//===============================================
+//=================Terminal Commands=========================
+//nodemon 
 
 // ===================== update route ================
 // 1. form from GET request
