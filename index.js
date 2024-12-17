@@ -40,80 +40,49 @@ app.get("/",(req,res) =>{
     res.render("home")
 });
 
+//===================Dynamic Loop to render Template.ejs file====================
+app.get("/user/:page", (req, res) => {
+    const { page } = req.params;
 
-// =================== view route ===================
-app.get("/user/calendar", (req,res) => {
+    // Map of pages to their queries and titles
+    const pageMap = {
+        calendar: { query: "SELECT * FROM calendar", title: "Calendar Database" },
+        expenses: { query: "SELECT * FROM run_expenses_entry", title: "Expenses" },
+        all_trades: { query: "SELECT * FROM daily_consolidated", title: "All Trades" },
+        profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" }
+    };
 
-    let q = 'SELECT * FROM calendar';
+    const pageDetails = pageMap[page];
 
-    try {
-        connection.query(q,(err,database) => {
-            if (err) throw err;
-            res.render("calendar.ejs",{database});
-            
-        });
-        
-    } catch (err) {
-        console.log(err);
+    if (pageDetails) {
+        try {
+            connection.query(pageDetails.query, (err, database) => {
+                if (err) throw err;
+
+                // Render the single template file and pass data
+                res.render("template.ejs", { database, title: pageDetails.title });
+            });
+        } catch (err) {
+            console.log(err);
+            res.status(500).send("Internal Server Error");
+        }
+    } else {
+        res.status(404).send("Page Not Found");
     }
 });
 
-app.get("/user/expenses", (req,res) => {
 
-    let q = 'SELECT * FROM run_expenses_entry;';
 
-    try {
-        connection.query(q,(err,database) => {
-            if (err) throw err;
-            res.render("expenses.ejs",{database});
-            
-        });
-        
-    } catch (err) {
-        console.log(err);
-    }
-});
-
-app.get("/user/all_trades", (req,res) => {
-
-    let q = 'SELECT * FROM all_trades;';
-
-    try {
-        connection.query(q,(err,database) => {
-            if (err) throw err;
-            res.render("all_trades.ejs",{database});
-            
-        });
-        
-    } catch (err) {
-        console.log(err);
-    }
-});
-
-app.get("/user/profit_loss", (req,res) => {
-
-    let q = 'SELECT * FROM combined_profit_loss;';
-
-    try {
-        connection.query(q,(err,database) => {
-            if (err) throw err;
-            res.render("ProfitLoss.ejs",{database});
-            
-        });
-        
-    } catch (err) {
-        console.log(err);
-    }
-});
 //================Git Commands =================
 //git clone link to the repository
 //git status
-//git push .
-//git commit -m"changes made"
+//git add .
+//git commit -m "changes made"
 //git push origin main
 
 //=================Terminal Commands=========================
-//nodemon 
+//nodemon
+//Ctrl+C - It kills the server 
 
 // ===================== update route ================
 // 1. form from GET request
