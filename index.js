@@ -51,7 +51,7 @@ app.get("/user/:page", (req, res) => {
         all_trades: { query: "SELECT * FROM daily_consolidated", title: "All Trades" },
         profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" },
         liabilities: { query: "SELECT * FROM liability_entry", title: "Liabilities" },
-        passwords: { query: "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain", title: "Passwords" }
+        passwords: { query: "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain ORDER BY WebsiteID DESC", title: "Passwords" }
     };
 
     const pageDetails = pageMap[page];
