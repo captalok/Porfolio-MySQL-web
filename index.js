@@ -49,7 +49,9 @@ app.get("/user/:page", (req, res) => {
         calendar: { query: "SELECT * FROM calendar", title: "Calendar Database" },
         expenses: { query: "SELECT * FROM run_expenses_entry", title: "Expenses" },
         all_trades: { query: "SELECT * FROM daily_consolidated", title: "All Trades" },
-        profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" }
+        profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" },
+        liabilities: { query: "SELECT * FROM liability_entry", title: "Liabilities" },
+        passwords: { query: "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain", title: "Passwords" }
     };
 
     const pageDetails = pageMap[page];
@@ -70,8 +72,6 @@ app.get("/user/:page", (req, res) => {
         res.status(404).send("Page Not Found");
     }
 });
-
-
 
 //================Git Commands =================
 //git clone link to the repository

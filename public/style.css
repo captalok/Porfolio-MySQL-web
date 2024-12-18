@@ -1,14 +1,195 @@
-*{
-    margin-top: 10px;
-    margin-left: 10px;
+/* Global Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-th{
-    border: 2px solid black;
+/* Body */
+body {
+    background-color: #121212; /* Dark background */
+    color: #e0e0e0; /* Light text */
+    line-height: 1.6;
+    margin: 20px;
 }
-.text-center{
+
+/* Header */
+h1.text-center {
+    text-align: center;
+    color: #ffffff; /* Pure white for headers */
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Align the search box and heading */
+.d-flex {
+    padding: 0 10px; /* Add some padding to the sides */
+}
+
+.text-center {
+    margin: 0;
+    font-size: 2rem; /* Make the heading larger */
+}
+
+#searchBox {
+    margin-right: 10px; /* Add some spacing to the right */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Optional: Add shadow for better design */
+    border: 1px solid #444;
+    background-color: #333;
+    color: #fff;
+}
+
+/* For a better focus effect */
+#searchBox:focus {
+    outline: none;
+    border-color: #00bcd4;
+    box-shadow: 0 0 5px rgba(0, 188, 212, 0.8);
+}
+
+/* Container */
+.container {
+    width: 90%;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #1e1e1e; /* Dark gray background */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Slight shadow */
+    border-radius: 8px;
+}
+
+/* Responsive Table Container */
+.table-container {
+    width: 100%;
+    margin: 20px auto;
+    overflow-x: auto; /* Adds horizontal scrollbar when necessary */
+    padding: 10px;
+    border-radius: 10px;
+    background-color: #1e1e1e;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow for a clean look */
+}
+
+/* Table Styling */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 1rem;
+    text-align: left;
+    background-color: #1e1e1e; /* Solid dark background for the table */
+    border: 1px solid #444444; /* Border around the table */
+    border-radius: 8px; /* Rounded corners for a modern look */
+    overflow: hidden; /* Ensures rounded corners show correctly */
+}
+
+.table thead {
+    background-color: #333333; /* Darker header background */
+    color: #ffffff; /* White text for table headers */
+    text-transform: uppercase;
+}
+
+.table th {
+    padding: 12px;
+    text-align: center;
+    border: 1px solid #444444; /* Subtle border for header cells */
+    font-weight: bold;
+}
+
+.table tbody tr {
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+.table tbody tr:nth-child(odd) {
+    background-color: #252525; /* Dark gray for odd rows */
+}
+
+.table tbody tr:nth-child(even) {
+    background-color: #2a2a2a; /* Slightly lighter gray for even rows */
+}
+
+.table tbody tr:hover {
+    background-color: #3a3a3a; /* Lighter gray on hover */
+    transform: scale(1.01); /* Slight zoom effect */
+}
+
+.table td {
+    padding: 12px;
+    text-align: center;
+    color: #0a0909; /* Light gray text for cells */
+    border: 1px solid #444444; /* Subtle border for cell separation */
+    transition: background-color 0.3s ease;
+}
+
+/* Table Caption (Optional) */
+.table caption {
+    padding: 10px;
+    font-size: 1.2rem;
+    color: #bb86fc; /* Light purple for table caption */
     text-align: center;
 }
-.btn{
-    margin-left: 570px;
+
+
+/* Buttons */
+.buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.btn {
+    background-color: #6200ea; /* Purple primary button */
+    color: #ffffff;
+    border: none;
+    padding: 10px 20px;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    margin: 10px;
+}
+
+.btn:hover {
+    background-color: #3700b3; /* Darker purple on hover */
+    color: #e0e0e0;
+    transform: scale(1.05);
+}
+
+/* Links */
+a {
+    color: #bb86fc; /* Light purple */
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: #9b5fe0; /* Slightly brighter purple */
+}
+
+.text-green {
+    color: #28a745; /* Bootstrap green */
+    font-weight: bold;
+}
+.text-red {
+    color: #dc3545; /* Bootstrap red */
+    font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    h1.text-center {
+        font-size: 2rem;
+    }
+
+    .table, .table th, .table td {
+        font-size: 0.9rem;
+    }
+
+    .container {
+        padding: 10px;
+    }
 }
