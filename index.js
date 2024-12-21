@@ -48,9 +48,15 @@ app.get("/user/:page", (req, res) => {
     const pageMap = {
         calendar: { query: "SELECT ApptID, ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority, TradeID, CheckID FROM tblAppointments ORDER BY ApptStart DESC", title: "Calendar Database" },
 
-        expenses: { query: "SELECT VoucherLineT.VoucherLineID, VoucherT.VoucherID, VoucherT.VoucherDate, VoucherTypeT.VoucherType, AccountDetailT.AccountName, AccountTypeT.AccountType, VoucherLineT.DebitAmount, VoucherLineT.CreditAmount,    VoucherLineT.Narration, VoucherLineT.Notes, VoucherLineT.IsExported FROM VoucherLineT INNER JOIN VoucherT ON VoucherLineT.fVoucherID = VoucherT.VoucherID JOIN VoucherTypeT ON VoucherT.fVoucherType = VoucherTypeT.VoucherTypeID JOIN AccountDetailT ON VoucherLineT.fAccountDetail = AccountDetailT.AccountDetailID JOIN AccountTypeT ON VoucherlineT.fAccountType = AccountTypeT.AccountTypeID ORDER BY VoucherT.VoucherID DESC, VoucherT.VoucherDate", title: "Expenses" },
+        expenses: { query: "SELECT * from run_expenses_entry", title: "Expenses" },
 
-        all_trades: { query: "SELECT tradelinet.TradeLineID, tradelinet.TradeID, tradet.BuyDate, tradetypet.TradeType, tradelinet.BuyQty, tradelinet.BuyPrice, tradelinet.SellPrice, tradelinet.Brokerage,tradelinet.DepositWithdrawal, (SellPrice * BuyQty)-(BuyPrice * BuyQty) - Brokerage AS GrossProfit, SellPrice - BuyPrice AS Pips, tradelinet.SellDate, tradelinet.Note FROM tradelinet INNER JOIN tradet ON tradelinet.TradeID = tradet.TradeID JOIN brokert ON tradelinet.BrokerID = brokert.BrokerID JOIN tradetypet ON tradelinet.TradeTypeID = tradetypet.TradeTypeID JOIN scripnamet ON tradelinet.ScripID = scripnamet.ScripID ORDER BY tradelinet.TradeID DESC", title: "All Trades" },
+        all_trades: { query: "SELECT * from daily_trades", title: "All Trades" },
+
+        daily_consolidated: { query: "SELECT * from daily_consolidated", title: "Daily Trades" },
+
+        mly_trades: { query: "SELECT Trade_year,Trade_Month, profit, sBrokerage, sPips, sDepositWithdrawal from mly_trades", title: "Monthly Trades" },
+
+        yearly_trades: { query: "SELECT * from yearly_trades", title: "Yearly Trades" },
 
         profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" },
         liabilities: { query: "SELECT * FROM liability_entry", title: "Liabilities" },
