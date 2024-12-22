@@ -83,6 +83,45 @@ app.get("/user/:page", (req, res) => {
     }
 });
 
+// ======================= Dashboard =================
+app.get("/dashboard", (req, res) => {
+    try {
+        // Fetch required data for charts
+        const queries = {
+            profitLoss: "SELECT Trade_Year, Profit, Loss FROM combined_profit_loss",
+            monthlyTrades: "SELECT Trade_Year, profit FROM mly_trades",
+            yearlyTrades: "SELECT Trade_Year, profit, sDepositWithdrawal FROM yearly_trades"
+        };
+
+        const results = {};
+
+        // Use promises to handle multiple queries
+        const queryPromises = Object.keys(queries).map(key =>
+            new Promise((resolve, reject) => {
+                connection.query(queries[key], (err, result) => {
+                    if (err) reject(err);
+                    results[key] = result;
+                    resolve();
+                });
+            })
+        );
+
+        Promise.all(queryPromises)
+            .then(() => {
+                //console.log(results);
+                res.render("dashboard.ejs", { results });
+            })
+            .catch(err => {
+                console.log(err);
+                res.status(500).send("Internal Server Error");
+            });
+    } catch (err) {
+        console.log(err);
+        res.status(500).send("Internal Server Error");
+    }
+});
+
+
 //================Git Commands =================
 //git clone link to the repository
 //git status
