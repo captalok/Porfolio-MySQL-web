@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/style.css">
     <style>
         .chart-container {
             width: 80%;
@@ -15,6 +17,11 @@
 </head>
 <body>
     <h1 class="text-center">Dashboard</h1>
+
+    <!-- Profit & Loss Pie Chart -->
+    <div class="chart-container">
+        <canvas id="liabilitiesChart"></canvas>
+    </div>
 
     <!-- Profit & Loss Pie Chart -->
     <div class="chart-container">
@@ -31,9 +38,43 @@
         <canvas id="yearlyTradesChart"></canvas>
     </div>
 
+    <!-- Yearly Expenses Bar Chart -->
+    <div class="chart-container">
+        <canvas id="expensesChart"></canvas>
+    </div>
+
+    <!-- Monthly Expenses Bar Chart -->
+    <div class="chart-container">
+        <canvas id="monthlyExpensesChart"></canvas>
+    </div>
+
     <script>
         // Extracted data passed from the server
         const results = <%- JSON.stringify(results) %>;
+
+        // Liabilities Bar Chart
+        const liabilitiesCtx = document.getElementById('liabilitiesChart').getContext('2d');
+        new Chart(liabilitiesCtx, {
+            type: 'bar',
+            data: {
+                labels: results.liabilities.map(item => item.AcctName),
+                datasets: [{
+                    label: 'Liabilities',
+                    data: results.liabilities.map(item => item.AmtBal),
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Year' } },
+                    y: { title: { display: true, text: 'Profit' } }
+                }
+            }
+        });
 
         // Profit & Loss Bar Chart
         const profitLossCtx = document.getElementById('profitLossChart').getContext('2d');
@@ -129,6 +170,54 @@
                     title: { display: true, text: 'Amount' },
                     beginAtZero: true // Ensure the Y-axis starts at 0
                     }
+                }
+            }
+        });
+
+        // Expenses Bar Chart
+        const expensesCtx = document.getElementById('expensesChart').getContext('2d');
+        new Chart(expensesCtx, {
+            type: 'bar',
+            data: {
+                labels: results.expenses.map(item => item.AccountName),
+                datasets: [{
+                    label: 'Expenses',
+                    data: results.expenses.map(item => item.amt_spent),
+                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red color for Loss
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Year' } },
+                    y: { title: { display: true, text: 'Profit' } }
+                }
+            }
+        });
+
+        // Monthly Expenses Bar Chart
+        const monthlyExpensesCtx = document.getElementById('monthlyExpensesChart').getContext('2d');
+        new Chart(monthlyExpensesCtx, {
+            type: 'bar',
+            data: {
+                labels: results.monthlyExpenses.map(item => item.Expense_Year),
+                datasets: [{
+                    label: 'Monthly Expenses',
+                    data: results.monthlyExpenses.map(item => item.Expenses),
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 2,
+                    fill: false
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    x: { title: { display: true, text: 'Year' } },
+                    y: { title: { display: true, text: 'Profit' } }
                 }
             }
         });

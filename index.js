@@ -90,7 +90,10 @@ app.get("/dashboard", (req, res) => {
         const queries = {
             profitLoss: "SELECT Trade_Year, Profit, Loss FROM combined_profit_loss",
             monthlyTrades: "SELECT Trade_Year, profit FROM mly_trades",
-            yearlyTrades: "SELECT Trade_Year, profit, sDepositWithdrawal FROM yearly_trades"
+            yearlyTrades: "SELECT Trade_Year, profit, sDepositWithdrawal FROM yearly_trades",
+            expenses: "SELECT AccountName, amt_spent FROM sum_account_name WHERE AccountName IN('Household Items', 'Bills', 'Education', 'Telecom', 'Travel', 'GIC Loan', 'Purchases', 'Mess Bill', 'LPG Gas', 'Gifts', 'Food and Drinks', 'Credit Card', 'Shopping Mall', 'Card Fee', 'Entertainment', 'Electricity', 'Spiritual', 'Health', 'Fuel')",
+            monthlyExpenses: "SELECT Expense_Year, Expenses FROM mly_expenses WHERE Expense_Year != '2022'",
+            liabilities: "SELECT AcctName, AmtBal FROM Demat_Expenses where AcctName IN('Bank', 'Cash', 'Wallet', 'Demat', 'Credit Card')"
         };
 
         const results = {};
