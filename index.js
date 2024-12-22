@@ -46,9 +46,9 @@ app.get("/user/:page", (req, res) => {
 
     // Map of pages to their queries and titles
     const pageMap = {
-        calendar: { query: "SELECT ApptID, ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority, TradeID, CheckID FROM tblAppointments ORDER BY ApptStart DESC", title: "Calendar Database" },
+        calendar: { query: "SELECT ApptID, ApptSubject, ApptLocation, ApptStart, ApptNotes FROM tblAppointments ORDER BY ApptStart DESC", title: "Calendar Database" },
 
-        expenses: { query: "SELECT * from run_expenses_entry", title: "Expenses" },
+        expenses: { query: "SELECT VoucherDate, AccountName, AccountType, DebitAmount, CreditAmount, Narration from run_expenses_entry", title: "Expenses" },
 
         all_trades: { query: "SELECT * from daily_trades", title: "All Trades" },
 
@@ -92,7 +92,7 @@ app.get("/dashboard", (req, res) => {
             monthlyTrades: "SELECT Trade_Year, profit FROM mly_trades",
             yearlyTrades: "SELECT Trade_Year, profit, sDepositWithdrawal FROM yearly_trades",
             expenses: "SELECT AccountName, amt_spent FROM sum_account_name WHERE AccountName IN('Household Items', 'Bills', 'Education', 'Telecom', 'Travel', 'GIC Loan', 'Purchases', 'Mess Bill', 'LPG Gas', 'Gifts', 'Food and Drinks', 'Credit Card', 'Shopping Mall', 'Card Fee', 'Entertainment', 'Electricity', 'Spiritual', 'Health', 'Fuel')",
-            monthlyExpenses: "SELECT Expense_Year, Expenses FROM mly_expenses WHERE Expense_Year != '2022'",
+            monthlyExpenses: "SELECT Expense_Year, Expenses FROM mly_expenses WHERE Expenses < 10000000",
             liabilities: "SELECT AcctName, AmtBal FROM Demat_Expenses where AcctName IN('Bank', 'Cash', 'Wallet', 'Demat', 'Credit Card')"
         };
 
