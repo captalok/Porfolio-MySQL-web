@@ -13,7 +13,7 @@ const mysql = require ("mysql2");
 const connection = mysql.createConnection({
     host : "localhost",
     user : "root",
-    database : "portfoliomysql",
+    database : "universalportfolio",
     password : "&&Alok&&24"
 });
 
@@ -123,6 +123,94 @@ app.get("/dashboard", (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
+
+const formatDateTime = (dateTime) => {
+    const date = new Date(dateTime);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+    const day = String(date.getDate()).padStart(2, '0');
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    return `${year}-${month}-${day}T${hours}:${minutes}`;
+};
+
+// Render calendar table with Insert and Edit actions
+app.get("/calendar", (req, res) => {
+    const query = "SELECT ApptID, ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority FROM tblAppointments ORDER BY ApptStart DESC";
+
+    connection.query(query, (err, database) => {
+        if (err) return res.status(500).send("Internal Server Error");
+
+        res.render("calendar", { database });
+    });
+});
+
+// Route to render Insert/Edit form
+app.get("/calendar/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+
+    if (action === "edit" && id) {
+        // Fetch the specific record for editing
+        const query = "SELECT * FROM tblAppointments WHERE ApptID = ?";
+        connection.query(query, [id], (err, database) => {
+            if (err) {
+                console.error("Error fetching data for edit:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+
+            if (database.length > 0) {
+                const data = database[0];
+
+                // Format date-time fields for `datetime-local` input
+                if (data.ApptStart) data.ApptStart = formatDateTime(data.ApptStart);
+                if (data.ApptEnd) data.ApptEnd = formatDateTime(data.ApptEnd);
+
+                res.render("calendar_form", { action, data });
+            } else {
+                res.status(404).send("Record not found.");
+            }
+        });
+    } else if (action === "insert") {
+        res.render("calendar_form", { action, data: {} });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
+
+// Route to handle Insert/Update logic
+app.post("/calendar/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+    const { ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority } = req.body;
+
+    if (action === "insert") {
+        // Insert new record
+        const query = `INSERT INTO tblAppointments (ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority) VALUES (?, ?, ?, ?, ?, ?)`;
+        const values = [ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority];
+
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error inserting data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/calendar");
+        });
+    } else if (action === "edit" && id) {
+        // Update existing record
+        const query = `UPDATE tblAppointments SET ApptSubject = ?, ApptLocation = ?, ApptStart = ?, ApptEnd = ?, ApptNotes = ?, Priority = ? WHERE ApptID = ?`;
+        const values = [ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority, id];
+
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/calendar");
+        });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
+
 
 
 //================Git Commands =================

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= action === "insert" ? "Insert Appointment" : "Edit Appointment" %></title>
+</head>
+
+<body>
+    <h1><%= action === "insert" ? "Insert Appointment" : "Edit Appointment" %></h1>
+
+    <form method="POST" action="/calendar/<%= action %>/<%= data.ApptID || "" %>">
+        <div>
+            <label for="ApptSubject">Subject:</label>
+            <input type="text" id="ApptSubject" name="ApptSubject" value="<%= data.ApptSubject || "" %>" required>
+        </div>
+        <div>
+            <label for="ApptLocation">Location:</label>
+            <input type="text" id="ApptLocation" name="ApptLocation" value="<%= data.ApptLocation || "" %>" required>
+        </div>
+        <div>
+            <label for="ApptStart">Start:</label>
+            <input type="datetime-local" id="ApptStart" name="ApptStart" value="<%= data.ApptStart || "" %>" required>
+        </div>
+        <div>
+            <label for="ApptEnd">End:</label>
+            <input type="datetime-local" id="ApptEnd" name="ApptEnd" value="<%= data.ApptEnd || "" %>" required>
+        </div>
+        <div>
+            <label for="ApptNotes">Notes:</label>
+            <textarea id="ApptNotes" name="ApptNotes"><%= data.ApptNotes || "" %></textarea>
+        </div>
+        <div>
+            <label for="Priority">Priority:</label>
+            <input type="text" id="Priority" name="Priority" value="<%= data.Priority || "" %>">
+        </div>
+        <button type="submit"><%= action === "insert" ? "Insert" : "Update" %></button>
+    </form>
+</body>
+
+</html>
