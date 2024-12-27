@@ -124,11 +124,7 @@
                 <!-- Priority -->
                 <div class="mb-3">
                     <label for="Priority" class="form-label">Priority</label>
-                    <select id="Priority" name="Priority" class="form-select">
-                        <option value="High" <%= data.Priority === "High" ? "selected" : "" %>>High</option>
-                        <option value="Medium" <%= data.Priority === "Medium" ? "selected" : "" %>>Medium</option>
-                        <option value="Low" <%= data.Priority === "Low" ? "selected" : "" %>>Low</option>
-                    </select>
+                    <input type="int" id="Priority" name="Priority" class="form-control" value="<%= data.Priority || '' %>">
                 </div>
 
                 <!-- Submit Button -->
