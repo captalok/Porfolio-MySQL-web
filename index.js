@@ -211,6 +211,85 @@ app.post("/calendar/:action/:id?", (req, res) => {
     }
 });
 
+// Render document table with Insert and Edit actions
+app.get("/document", (req, res) => {
+    const query = "SELECT DocID, DocUserName, DocName, DocPath, DocText FROM DocT JOIN DocUserT ON DocT.DocUserID = DocUserT.DocUserID ORDER BY DocID DESC";
+
+    connection.query(query, (err, database) => {
+        if (err) return res.status(500).send("Internal Server Error");
+
+        res.render("document", { database });
+    });
+});
+
+// Route to render Insert/Edit form with combo box
+app.get("/document/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+
+    const comboQuery = "SELECT DocUserID, DocUserName FROM DocUserT";
+
+    connection.query(comboQuery, (err, users) => {
+        if (err) {
+            console.error("Error fetching users for combo box:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        if (action === "edit" && id) {
+            const editQuery = "SELECT DocID, DocUserID, DocName, DocPath, DocText FROM DocT WHERE DocID = ?";
+            connection.query(editQuery, [id], (err, database) => {
+                if (err) {
+                    console.error("Error fetching data for edit:", err);
+                    return res.status(500).send("Internal Server Error");
+                }
+
+                if (database.length > 0) {
+                    const data = database[0];
+                    res.render("document_form", { action, data, users });
+                } else {
+                    res.status(404).send("Record not found.");
+                }
+            });
+        } else if (action === "insert") {
+            res.render("document_form", { action, data: {}, users });
+        } else {
+            res.status(400).send("Invalid action.");
+        }
+    });
+});
+
+// Route to handle Insert/Update logic
+app.post("/document/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+    const { DocUserID, DocName, DocPath, DocText } = req.body;
+
+    if (action === "insert") {
+        const query = "INSERT INTO DocT (DocUserID, DocName, DocPath, DocText) VALUES (?, ?, ?, ?)";
+        const values = [DocUserID, DocName, DocPath, DocText];
+
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error inserting data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/document");
+        });
+    } else if (action === "edit" && id) {
+        const query = "UPDATE DocT SET DocName = ?, DocPath = ?, DocText = ?, DocUserID = ? WHERE DocID = ?";
+        const values = [DocName, DocPath, DocText, DocUserID, id];
+
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/document");
+        });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
+
+
 
 
 //================Git Commands =================
