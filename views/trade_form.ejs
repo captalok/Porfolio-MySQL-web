@@ -125,7 +125,7 @@
                 <!-- Deposit Withdrawal -->
                 <div class="mb-3">
                     <label for="DepositWithdrawal" class="form-label">Deposit</label>
-                    <input type="double" id="DepositWithdrawal" name="DepositWithdrawal" class="form-control" value="<%= data.DepositWithdrawal || '' %>" required>
+                    <input type="double" id="DepositWithdrawal" name="DepositWithdrawal" class="form-control" value="<%= data.DepositWithdrawal !== undefined && data.DepositWithdrawal !== null ? data.DepositWithdrawal : '' %>" required>
                 </div>
                 
                 <!-- BrokerID Combo Box -->
@@ -167,7 +167,7 @@
                 <!-- Sell Date -->
                 <div class="mb-3">
                     <label for="SellDate" class="form-label">Sell Date</label>
-                    <input type="datetime-local" id="SellDate" name="SellDate" class="form-control" value="<%= data.SellDate || '' %>" required>
+                    <input type="date" id="SellDate" name="SellDate" class="form-control" value="<%= data.SellDate || '' %>" required>
                 </div>
 
                 <!-- Submit Button -->

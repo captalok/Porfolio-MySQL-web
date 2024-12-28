@@ -17,6 +17,15 @@ const connection = mysql.createConnection({
     password : "&&Alok&&24"
 });
 
+// Add the formatDate function here
+function formatDate(date) {
+    if (!date) return '';
+    const d = new Date(date);
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+}
 
 app.use(methodOverride("_method"));
 
@@ -70,6 +79,13 @@ app.get("/user/:page", (req, res) => {
         try {
             connection.query(pageDetails.query, (err, database) => {
                 if (err) throw err;
+
+                // Format Date for all rows
+                database.forEach(row => {
+                    if (row.ApptStart) row.ApptStart = formatDate(row.ApptStart);
+                    if (row.VoucherDate) row.VoucherDate = formatDate(row.VoucherDate);
+                    if (row.BuyDate) row.BuyDate = formatDate(row.BuyDate);
+                });               
 
                 // Render the single template file and pass data
                 res.render("template.ejs", { database, title: pageDetails.title });
@@ -141,6 +157,12 @@ app.get("/calendar", (req, res) => {
     connection.query(query, (err, database) => {
         if (err) return res.status(500).send("Internal Server Error");
 
+        // Format BuyDate for all rows
+        database.forEach(row => {
+            if (row.ApptStart) row.ApptStart = formatDate(row.ApptStart);
+            if (row.ApptEnd) row.ApptEnd = formatDate(row.ApptEnd);
+        });
+
         res.render("calendar", { database });
     });
 });
@@ -162,8 +184,8 @@ app.get("/calendar/:action/:id?", (req, res) => {
                 const data = database[0];
 
                 // Format date-time fields for `datetime-local` input
-                if (data.ApptStart) data.ApptStart = formatDateTime(data.ApptStart);
-                if (data.ApptEnd) data.ApptEnd = formatDateTime(data.ApptEnd);
+                if (data.ApptStart) data.ApptStart = formatDate(data.ApptStart);
+                if (data.ApptEnd) data.ApptEnd = formatDate(data.ApptEnd);
 
                 res.render("calendar_form", { action, data });
             } else {
@@ -304,6 +326,12 @@ app.get("/trade", (req, res) => {
     connection.query(query, (err, database) => {
         if (err) return res.status(500).send("Internal Server Error");
 
+        // Format BuyDate for all rows
+        database.forEach(row => {
+            if (row.BuyDate) row.BuyDate = formatDate(row.BuyDate);
+            if (row.SellDate) row.SellDate = formatDate(row.SellDate);
+        });
+
         res.render("trade", { database });
     });
 });
@@ -347,7 +375,8 @@ app.get("/trade/:action/:id?", (req, res) => {
 
                         if (database.length >= 0) {
                             const data = database[0];
-                            if (data.SellDate) data.SellDate = formatDateTime(data.SellDate);
+                            if (data.BuyDate) data.BuyDate = formatDate(data.BuyDate);
+                            if (data.SellDate) data.SellDate = formatDate(data.SellDate);
                             res.render("trade_form", { action, data, brokers, scrips, types });
                         } else {
                             res.status(404).send("Record not found.");
@@ -394,7 +423,7 @@ app.post("/trade/:action/:id?", (req, res) => {
                 console.error("Error inserting data:", err);
                 return res.status(500).send("Internal Server Error");
             }
-            res.redirect("/trade");
+            res.redirect("/trade/insert");
         });
     } else if (action === "edit" && id) {
         const updateQuery = `
@@ -445,6 +474,11 @@ app.get("/tradeid", (req, res) => {
     connection.query(query, (err, database) => {
         if (err) return res.status(500).send("Internal Server Error");
 
+        // Format BuyDate for all rows
+        database.forEach(row => {
+            if (row.BuyDate) row.BuyDate = formatDate(row.BuyDate);
+        });
+
         res.render("tradeid", { database });
     });
 });
@@ -465,8 +499,8 @@ app.get("/tradeid/:action/:id?", (req, res) => {
     
             if (database.length >= 0) {
                 const data = database[0];
-                // Format date-time fields for `datetime-local` input
-                if (data.BuyDate) data.BuyDate = formatDateTime(data.BuyDate);
+                // Format date for display
+            if (data.BuyDate) data.BuyDate = formatDate(data.BuyDate);
                 res.render("tradeid_form", { action, data });
             } else {
                 res.status(404).send("Record not found.");
