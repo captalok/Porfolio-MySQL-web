@@ -253,7 +253,11 @@ app.get("/document/:action/:id?", (req, res) => {
                 }
             });
         } else if (action === "insert") {
-            res.render("document_form", { action, data: {}, users });
+            // Default values for the form
+            const defaultData = {                
+                DocUserID: users[0]?.DocUserID || 1 // Default TradeTypeID
+            };
+            res.render("document_form", { action, data: defaultData, users });            
         } else {
             res.status(400).send("Invalid action.");
         }
@@ -314,21 +318,21 @@ app.get("/trade/:action/:id?", (req, res) => {
 
     connection.query(brokerQuery, (err, brokers) => {
         if (err) {
-            console.error("Error fetching users for combo box:", err);
+            console.error("Error fetching brokers for combo box:", err);
             return res.status(500).send("Internal Server Error");
         }
 
         connection.query(scripQuery, (err, scrips) => {
             if (err) {
-                console.error("Error fetching users for combo box:", err);
+                console.error("Error fetching scrips for combo box:", err);
                 return res.status(500).send("Internal Server Error");
             }
 
-            connection.query(typeQuery, (err,types) => {
-                if (err){
-                    console.error("Error fetching users for combo box:", err);
+            connection.query(typeQuery, (err, types) => {
+                if (err) {
+                    console.error("Error fetching trade types for combo box:", err);
                     return res.status(500).send("Internal Server Error");
-                }        
+                }
 
                 if (action === "edit" && id) {
                     const editQuery = `
@@ -340,10 +344,9 @@ app.get("/trade/:action/:id?", (req, res) => {
                             console.error("Error fetching data for edit:", err);
                             return res.status(500).send("Internal Server Error");
                         }
-                
+
                         if (database.length >= 0) {
                             const data = database[0];
-                            // Format date-time fields for `datetime-local` input
                             if (data.SellDate) data.SellDate = formatDateTime(data.SellDate);
                             res.render("trade_form", { action, data, brokers, scrips, types });
                         } else {
@@ -351,14 +354,21 @@ app.get("/trade/:action/:id?", (req, res) => {
                         }
                     });
                 } else if (action === "insert") {
-                res.render("trade_form", { action, data: {}, brokers, scrips, types });
+                    // Default values for the form
+                    const defaultData = {
+                        BrokerID: brokers[5]?.BrokerID || 1, // Default BrokerID
+                        ScripID: scrips[24]?.ScripID || 1,    // Default ScripID
+                        TradeTypeID: types[0]?.TradeTypeID || 1 // Default TradeTypeID
+                    };
+                    res.render("trade_form", { action, data: defaultData, brokers, scrips, types });
                 } else {
-                res.status(400).send("Invalid action.");
+                    res.status(400).send("Invalid action.");
                 }
-            });    
-        });    
+            });
+        });
     });
 });
+
 
 // Route to handle Insert/Update logic
 app.post("/trade/:action/:id?", (req, res) => {
