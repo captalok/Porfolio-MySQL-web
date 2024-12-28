@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= action === "insert" ? "Insert Document" : "Edit Document" %></title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+        }
+
+        .form-container {
+            max-width: 600px;
+            margin: 50px auto;
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.5);
+        }
+
+        .form-container h1 {
+            font-size: 24px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            color: #ccc;
+        }
+
+        input, select, textarea {
+            background-color: #222;
+            color: #fff;
+            border: 1px solid #444;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            box-shadow: 0 0 5px #007bff;
+            border-color: #007bff;
+        }
+
+        button {
+            width: 100%;
+            background-color: #007bff;
+            border: none;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 4px;
+            color: white;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .btn-secondary {
+            background-color: #444;
+        }
+
+        .btn-secondary:hover {
+            background-color: #333;
+        }
+
+        .form-footer {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .form-footer a {
+            color: #007bff;
+            text-decoration: none;
+        }
+
+        .form-footer a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="form-container">
+            <h1><%= action === "insert" ? "Add New Trade" : "Edit Trade" %></h1>
+            <form action="/trade/<%= action %><%= action === 'edit' ? `/${data.TradeLineID}` : '' %>" method="POST">
+                
+                <!-- TradeID -->
+                <div class="mb-3">
+                    <label for="TradeID" class="form-label">TradeID</label>
+                    <input type="int" id="TradeID" name="TradeID" class="form-control" value="<%= data.TradeID || '' %>" required>
+                </div>
+
+                <!-- Buy Sell Qty -->
+                <div class="mb-3">
+                    <label for="BuyQty" class="form-label">Buy Qty</label>
+                    <input type="int" id="BuyQty" name="BuyQty" class="form-control" value="<%= data.BuyQty || '' %>" required>
+                </div>
+
+                <!-- Buy Price -->
+                <div class="mb-3">
+                    <label for="BuyPrice" class="form-label">Buy Price</label>
+                    <input type="double" id="BuyPrice" name="BuyPrice" class="form-control" value="<%= data.BuyPrice || '' %>" required>
+                </div>
+
+                <!-- Sell Price -->
+                <div class="mb-3">
+                    <label for="SellPrice" class="form-label">Sell Price</label>
+                    <input type="double" id="SellPrice" name="SellPrice" class="form-control" value="<%= data.SellPrice || '' %>" required>
+                </div>
+
+                <!-- Brokerage -->
+                <div class="mb-3">
+                    <label for="Brokerage" class="form-label">Brokerage</label>
+                    <input type="double" id="Brokerage" name="Brokerage" class="form-control" value="<%= data.Brokerage || '' %>" required>
+                </div>
+
+                <!-- Deposit Withdrawal -->
+                <div class="mb-3">
+                    <label for="DepositWithdrawal" class="form-label">Deposit</label>
+                    <input type="double" id="DepositWithdrawal" name="DepositWithdrawal" class="form-control" value="<%= data.DepositWithdrawal || '' %>" required>
+                </div>
+
+                <!-- BrokerID Combo Box -->
+                <div class="mb-3">
+                    <label for="BrokerID" class="form-label">Broker</label>
+                    <select id="BrokerID" name="BrokerID" class="form-control">
+                        <% brokers.forEach(broker => { %>
+                            <option value="<%= broker.BrokerID %>" <%= broker.BrokerID === data.BrokerID ? 'selected' : '' %>><%= broker.BrokerName %></option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <!-- ScripID Combo Box -->
+                <div class="mb-3">
+                    <label for="ScripID" class="form-label">Scrip Name</label>
+                    <select id="ScripID" name="ScripID" class="form-control">
+                        <% scrips.forEach(scrip => { %>
+                            <option value="<%= scrip.ScripID %>" <%= scrip.ScripID === data.ScripID ? 'selected' : '' %>><%= scrip.ScripName %></option>
+                        <% }); %>
+                    </select>
+                </div>
+
+                <!-- TradeTypeID Combo Box -->
+                <div class="mb-3">
+                    <label for="TradeTypeID" class="form-label">Trade Type</label>
+                    <select id="TradeTypeID" name="TradeTypeID" class="form-control">
+                        <% types.forEach(type => { %>
+                            <option value="<%= type.TradeTypeID %>" <%= type.TradeTypeID === data.TradeTypeID ? 'selected' : '' %>><%= type.TradeType %></option>
+                        <% }); %>
+                    </select>
+                </div>               
+
+                <!-- Note -->
+                <div class="mb-3">
+                    <label for="Note" class="form-label">Note</label>
+                    <input type="text" id="Note" name="Note" class="form-control" value="<%= data.Note || '' %>" required>
+                </div>
+
+                <!-- Sell Date -->
+                <div class="mb-3">
+                    <label for="SellDate" class="form-label">Sell Date</label>
+                    <input type="datetime-local" id="SellDate" name="SellDate" class="form-control" value="<%= data.SellDate || '' %>" required>
+                </div>
+
+                <!-- Submit Button -->
+                <button type="submit" class="btn btn-primary"><%= action === "insert" ? "Add Trade" : "Save Changes" %></button>
+
+                <!-- Cancel Button -->
+                <a href="/trade" class="btn btn-secondary mt-3">Cancel</a>
+            </form>
+        </div>
+    </div>
+</body>
+
+</html>

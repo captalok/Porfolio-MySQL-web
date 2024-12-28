@@ -133,7 +133,7 @@ const formatDateTime = (dateTime) => {
     const minutes = String(date.getMinutes()).padStart(2, '0');
     return `${year}-${month}-${day}T${hours}:${minutes}`;
 };
-
+//=========================Calendar ========================================
 // Render calendar table with Insert and Edit actions
 app.get("/calendar", (req, res) => {
     const query = "SELECT ApptID, ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority FROM tblAppointments ORDER BY ApptStart DESC";
@@ -211,15 +211,18 @@ app.post("/calendar/:action/:id?", (req, res) => {
     }
 });
 
+//===============================Documents=========================================
 // Render document table with Insert and Edit actions
-app.get("/document", (req, res) => {
-    const query = "SELECT DocID, DocUserName, DocName, DocPath, DocText FROM DocT JOIN DocUserT ON DocT.DocUserID = DocUserT.DocUserID ORDER BY DocID DESC";
+app.get("/document", (req, res) => {   
+    
+    const query = "SELECT DocID, DocUserName, DocName, DocPath, DocText FROM DocT JOIN DocUserT ON DocT.DocUserID = DocUserT.DocUserID ORDER BY DocID DESC";   
 
     connection.query(query, (err, database) => {
         if (err) return res.status(500).send("Internal Server Error");
 
         res.render("document", { database });
     });
+        
 });
 
 // Route to render Insert/Edit form with combo box
@@ -289,8 +292,224 @@ app.post("/document/:action/:id?", (req, res) => {
     }
 });
 
+//===============================Trades=========================================
+// Render trade table with Insert and Edit actions
+app.get("/trade", (req, res) => {
+    const query = "SELECT tradelinet.TradeLineID, tradelinet.TradeID, tradet.BuyDate, tradetypet.TradeType, tradelinet.BuyQty, tradelinet.BuyPrice, tradelinet.SellPrice, tradelinet.Brokerage,tradelinet.DepositWithdrawal, (SellPrice * BuyQty)-(BuyPrice * BuyQty) - Brokerage AS GrossProfit, SellPrice - BuyPrice AS Pips, tradelinet.SellDate, tradelinet.Note FROM tradelinet INNER JOIN tradet ON tradelinet.TradeID = tradet.TradeID JOIN brokert ON tradelinet.BrokerID = brokert.BrokerID JOIN tradetypet ON tradelinet.TradeTypeID = tradetypet.TradeTypeID JOIN scripnamet ON tradelinet.ScripID = scripnamet.ScripID ORDER BY tradelinet.TradeID DESC";
 
+    connection.query(query, (err, database) => {
+        if (err) return res.status(500).send("Internal Server Error");
 
+        res.render("trade", { database });
+    });
+});
+
+// Route to render Insert/Edit form with combo box
+app.get("/trade/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+
+    const brokerQuery = "SELECT BrokerID, BrokerName FROM brokert";
+    const scripQuery = "SELECT ScripID, ScripName FROM scripnamet";
+    const typeQuery = "SELECT TradeTypeID, TradeType FROM tradetypet";
+
+    connection.query(brokerQuery, (err, brokers) => {
+        if (err) {
+            console.error("Error fetching users for combo box:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        connection.query(scripQuery, (err, scrips) => {
+            if (err) {
+                console.error("Error fetching users for combo box:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+
+            connection.query(typeQuery, (err,types) => {
+                if (err){
+                    console.error("Error fetching users for combo box:", err);
+                    return res.status(500).send("Internal Server Error");
+                }        
+
+                if (action === "edit" && id) {
+                    const editQuery = `
+                    SELECT TradeLineID, TradeID, BrokerID, ScripID, TradeTypeID, BuyQty, BuyPrice, SellPrice, Brokerage, DepositWithdrawal, SellDate, Note 
+                    FROM TradeLineT 
+                    WHERE TradeLineID = ?`;
+                    connection.query(editQuery, [id], (err, database) => {
+                        if (err) {
+                            console.error("Error fetching data for edit:", err);
+                            return res.status(500).send("Internal Server Error");
+                        }
+                
+                        if (database.length >= 0) {
+                            const data = database[0];
+                            // Format date-time fields for `datetime-local` input
+                            if (data.SellDate) data.SellDate = formatDateTime(data.SellDate);
+                            res.render("trade_form", { action, data, brokers, scrips, types });
+                        } else {
+                            res.status(404).send("Record not found.");
+                        }
+                    });
+                } else if (action === "insert") {
+                res.render("trade_form", { action, data: {}, brokers, scrips, types });
+                } else {
+                res.status(400).send("Invalid action.");
+                }
+            });    
+        });    
+    });
+});
+
+// Route to handle Insert/Update logic
+app.post("/trade/:action/:id?", (req, res) => {
+    // console.log("Route hit:");
+    // console.log("Action:", req.params.action);
+    // console.log("ID:", req.params.id);
+    // console.log("Body:", req.body);
+
+    const { action, id } = req.params;
+    const { BuyQty, BrokerID, ScripID, TradeTypeID, Brokerage, BuyPrice, SellPrice, DepositWithdrawal, Note, SellDate, TradeID } = req.body;
+
+    if (action === "insert") {
+        const query = "INSERT INTO tradelinet (BuyQty, BrokerID, ScripID, TradeTypeID,Brokerage, BuyPrice, SellPrice, DepositWithdrawal, Note, SellDate, TradeID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        const values = [BuyQty, BrokerID, ScripID, TradeTypeID, Brokerage, BuyPrice, SellPrice, DepositWithdrawal, Note, SellDate, TradeID];
+
+        // Debugging logs
+        // console.log("INSERT Action:");
+        // console.log("Query:", query);
+        // console.log("Values:", values);
+
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error inserting data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/trade");
+        });
+    } else if (action === "edit" && id) {
+        const updateQuery = `
+        UPDATE TradeLineT, tradet
+        SET 
+            TradeLineT.TradeID = ?, 
+            BrokerID = ?,             
+            ScripID = ?, 
+            TradeTypeID = ?, 
+            BuyQty = ?, 
+            BuyPrice = ?, 
+            SellPrice = ?, 
+            Brokerage = ?, 
+            DepositWithdrawal = ?, 
+            SellDate = ?, 
+            Note = ?
+        WHERE TradeLineT.TradeID = TradeT.TradeID AND TradeLineID = ?`;
+
+        const values = [
+            TradeID, BrokerID, ScripID, TradeTypeID, 
+            BuyQty, BuyPrice, SellPrice, Brokerage, 
+            DepositWithdrawal, SellDate, Note, id
+        ];
+        // Debugging logs
+        // console.log("EDIT Action:");
+        // console.log("ID:", id);
+        // console.log("Query:", updateQuery);
+        // console.log("Values:", values);
+
+        connection.query(updateQuery, values, (err) => {            
+
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/trade");
+        });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
+
+//===============================Trade ID Generate=======================================
+// Render tradeid table with Insert and Edit actions
+app.get("/tradeid", (req, res) => {
+    const query = "SELECT TradeID, BuyDate From tradet ORDER BY TradeID DESC";
+
+    connection.query(query, (err, database) => {
+        if (err) return res.status(500).send("Internal Server Error");
+
+        res.render("tradeid", { database });
+    });
+});
+
+// Route to render Insert/Edit form with combo box
+app.get("/tradeid/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+    if (action === "edit" && id) {
+        const editQuery = `
+        SELECT TradeID, BuyDate 
+        FROM tradet 
+        WHERE TradeID = ?`;
+        connection.query(editQuery, [id], (err, database) => {
+            if (err) {
+                console.error("Error fetching data for edit:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+    
+            if (database.length >= 0) {
+                const data = database[0];
+                // Format date-time fields for `datetime-local` input
+                if (data.BuyDate) data.BuyDate = formatDateTime(data.BuyDate);
+                res.render("tradeid_form", { action, data });
+            } else {
+                res.status(404).send("Record not found.");
+            }
+        });
+    } else if (action === "insert") {
+    res.render("tradeid_form", { action, data: {} });
+    } else {
+    res.status(400).send("Invalid action.");
+    }           
+    
+});
+
+// Route to handle Insert/Update logic
+app.post("/tradeid/:action/:id?", (req, res) => {
+    
+    const { action, id } = req.params;
+    const { BuyDate } = req.body;
+
+    if (action === "insert") {
+        const query = "INSERT INTO tradet (BuyDate) VALUES (?)";
+        const values = [BuyDate];
+        
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error inserting data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/tradeid");
+        });
+    } else if (action === "edit" && id) {
+        const updateQuery = `
+        UPDATE tradet
+        SET             
+            BuyDate = ?
+        WHERE TradeID = ?`;
+
+        const values = [
+            BuyDate, id
+        ];
+        
+        connection.query(updateQuery, values, (err) => {            
+
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/tradeid");
+        });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
 
 //================Git Commands =================
 //git clone link to the repository
