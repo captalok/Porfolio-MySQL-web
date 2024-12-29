@@ -1,0 +1,16 @@
+/* CSS for search input styling */
+.search-container {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: center;
+}
+
+.search-box {
+    width: 40%;
+    padding: 10px;
+    border: 2px solid #333;
+    border-radius: 5px;
+    font-size: 16px;
+    background-color: #222;
+    color: white;
+}

@@ -132,11 +132,16 @@ h1.text-center {
 
 
 /* Buttons */
+
 .buttons {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 20px;
+    flex-wrap: wrap; /* Allows buttons to wrap to the next line */
+    gap: 10px; /* Adds spacing between buttons */
+    justify-content: start; /* Align buttons to the left */
+}
+
+.buttons form {
+    flex: 0 0 calc(20% - 10px); /* Ensures 5 buttons fit in one row */
 }
 
 .btn {
