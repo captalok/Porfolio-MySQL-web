@@ -336,13 +336,13 @@ app.get("/trade", (req, res) => {
     });
 });
 
-// Route to render Insert/Edit form with combo box
 app.get("/trade/:action/:id?", (req, res) => {
     const { action, id } = req.params;
 
     const brokerQuery = "SELECT BrokerID, BrokerName FROM brokert";
     const scripQuery = "SELECT ScripID, ScripName FROM scripnamet";
     const typeQuery = "SELECT TradeTypeID, TradeType FROM tradetypet";
+    const tradeIDQuery = "SELECT TradeID FROM tradet ORDER BY TradeID DESC LIMIT 1";
 
     connection.query(brokerQuery, (err, brokers) => {
         if (err) {
@@ -373,7 +373,7 @@ app.get("/trade/:action/:id?", (req, res) => {
                             return res.status(500).send("Internal Server Error");
                         }
 
-                        if (database.length >= 0) {
+                        if (database.length > 0) {
                             const data = database[0];
                             if (data.BuyDate) data.BuyDate = formatDate(data.BuyDate);
                             if (data.SellDate) data.SellDate = formatDate(data.SellDate);
@@ -383,13 +383,25 @@ app.get("/trade/:action/:id?", (req, res) => {
                         }
                     });
                 } else if (action === "insert") {
-                    // Default values for the form
-                    const defaultData = {
-                        BrokerID: brokers[5]?.BrokerID || 1, // Default BrokerID
-                        ScripID: scrips[24]?.ScripID || 1,    // Default ScripID
-                        TradeTypeID: types[0]?.TradeTypeID || 1 // Default TradeTypeID
-                    };
-                    res.render("trade_form", { action, data: defaultData, brokers, scrips, types });
+                    connection.query(tradeIDQuery, (err, result) => {
+                        if (err) {
+                            console.error("Error fetching latest TradeID:", err);
+                            return res.status(500).send("Internal Server Error");
+                        }
+
+                        const latestTradeID = result.length > 0 ? result[0].TradeID : 0;
+                        const nextTradeID = latestTradeID;
+
+                        // Default values for the form
+                        const defaultData = {
+                            TradeID: nextTradeID, // Auto-populated TradeID
+                            BrokerID: brokers[5]?.BrokerID || 1, // Default BrokerID
+                            ScripID: scrips[24]?.ScripID || 1,    // Default ScripID
+                            TradeTypeID: types[0]?.TradeTypeID || 1 // Default TradeTypeID
+                        };
+
+                        res.render("trade_form", { action, data: defaultData, brokers, scrips, types });
+                    });
                 } else {
                     res.status(400).send("Invalid action.");
                 }
@@ -398,25 +410,15 @@ app.get("/trade/:action/:id?", (req, res) => {
     });
 });
 
-
 // Route to handle Insert/Update logic
-app.post("/trade/:action/:id?", (req, res) => {
-    // console.log("Route hit:");
-    // console.log("Action:", req.params.action);
-    // console.log("ID:", req.params.id);
-    // console.log("Body:", req.body);
+app.post("/trade/:action/:id?", (req, res) => {   
 
     const { action, id } = req.params;
     const { BuyQty, BrokerID, ScripID, TradeTypeID, Brokerage, BuyPrice, SellPrice, DepositWithdrawal, Note, SellDate, TradeID } = req.body;
 
     if (action === "insert") {
         const query = "INSERT INTO tradelinet (BuyQty, BrokerID, ScripID, TradeTypeID,Brokerage, BuyPrice, SellPrice, DepositWithdrawal, Note, SellDate, TradeID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        const values = [BuyQty, BrokerID, ScripID, TradeTypeID, Brokerage, BuyPrice, SellPrice, DepositWithdrawal, Note, SellDate, TradeID];
-
-        // Debugging logs
-        // console.log("INSERT Action:");
-        // console.log("Query:", query);
-        // console.log("Values:", values);
+        const values = [BuyQty, BrokerID, ScripID, TradeTypeID, Brokerage, BuyPrice, SellPrice, DepositWithdrawal, Note, SellDate, TradeID];        
 
         connection.query(query, values, (err) => {
             if (err) {
@@ -446,12 +448,7 @@ app.post("/trade/:action/:id?", (req, res) => {
             TradeID, BrokerID, ScripID, TradeTypeID, 
             BuyQty, BuyPrice, SellPrice, Brokerage, 
             DepositWithdrawal, SellDate, Note, id
-        ];
-        // Debugging logs
-        // console.log("EDIT Action:");
-        // console.log("ID:", id);
-        // console.log("Query:", updateQuery);
-        // console.log("Values:", values);
+        ];        
 
         connection.query(updateQuery, values, (err) => {            
 
