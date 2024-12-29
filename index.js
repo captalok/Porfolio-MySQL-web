@@ -552,6 +552,261 @@ app.post("/tradeid/:action/:id?", (req, res) => {
     }
 });
 
+//===============================Finance=========================================
+// Render trade table with Insert and Edit actions
+app.get("/finance", (req, res) => {
+    const query = "SELECT VoucherLineT.VoucherLineID, VoucherT.VoucherID, VoucherT.VoucherDate, VoucherTypeT.VoucherType, AccountDetailT.AccountName, AccountTypeT.AccountType, VoucherLineT.DebitAmount, VoucherLineT.CreditAmount, VoucherLineT.Narration, VoucherLineT.Notes, VoucherLineT.IsExported FROM VoucherLineT INNER JOIN VoucherT ON VoucherLineT.fVoucherID = VoucherT.VoucherID JOIN VoucherTypeT ON VoucherT.fVoucherType = VoucherTypeT.VoucherTypeID JOIN AccountDetailT ON VoucherLineT.fAccountDetail = AccountDetailT.AccountDetailID JOIN AccountTypeT ON VoucherlineT.fAccountType = AccountTypeT.AccountTypeID ORDER BY VoucherT.VoucherID DESC, VoucherT.VoucherDate";
+
+    connection.query(query, (err, database) => {
+        if (err) return res.status(500).send("Internal Server Error");
+
+        // Format BuyDate for all rows
+        database.forEach(row => {
+            if (row.VoucherDate) row.VoucherDate = formatDate(row.VoucherDate);            
+        });
+
+        res.render("finance", { database });
+    });
+});
+
+app.get("/finance/:action/:id?", (req, res) => {    
+    
+    const { action, id } = req.params;
+    
+    const accountDetailQuery = "SELECT AccountDetailID, AccountName FROM accountdetailt";
+    const accountTypeQuery = "SELECT AccountTypeID, AccountType FROM accounttypet";
+    const modeQuery = "SELECT ModeID, ChkMode FROM tblchkmode";
+    const voucherIDQuery = "SELECT VoucherID From vouchert ORDER BY VoucherID DESC LIMIT 1";
+
+    connection.query(accountDetailQuery, (err, accountDetails) => {
+        if (err) {
+            console.error("Error fetching accountDetails for combo box:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        connection.query(accountTypeQuery, (err, accountTypes) => {
+            if (err) {
+                console.error("Error fetching accounttypes for combo box:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+
+            connection.query(modeQuery, (err, modes) => {
+                if(err) {
+                    console.error("Error fetching modes for combo box:", err);
+                    return res.status(500).send("Internal Server Error");
+                }
+
+                if (action === "edit" && id) {
+                    const editQuery = `
+                    SELECT 
+                        VoucherLineID, 
+                        VoucherID, 
+                        VoucherDate, 
+                        DebitAmount, 
+                        CreditAmount, 
+                        Narration, 
+                        Notes, 
+                        IsExported,
+                        VoucherLineT.fAccountDetail AS AccountDetailID, 
+                        VoucherLineT.fAccountType AS AccountTypeID 
+                    FROM VoucherLineT
+                    INNER JOIN VoucherT ON VoucherLineT.fVoucherID = VoucherT.VoucherID
+                    JOIN AccountDetailT ON VoucherLineT.fAccountDetail = AccountDetailT.AccountDetailID
+                    JOIN AccountTypeT ON VoucherLineT.fAccountType = AccountTypeT.AccountTypeID
+                    WHERE VoucherLineID = ?`;
+                    connection.query(editQuery, [id], (err, database) => {
+                        if (err) {
+                            console.error("Error fetching data for edit:", err);
+                            return res.status(500).send("Internal Server Error");
+                        }                        
+
+                        if (database.length > 0) {
+                            const data = database[0];
+                            res.render("finance_form", { action, data, accountDetails, accountTypes, modes });
+                        } else {
+                            res.status(404).send("Record not found.");
+                        }
+                    });
+                } else if (action === "insert") {
+                    connection.query(voucherIDQuery, (err, result) => {
+                        if (err) {
+                            console.error("Error fetching latest voucherID:", err);
+                            return res.status(500).send("Internal Server Error");
+                        }
+
+                        const latestVoucherID = result.length > 0 ? result[0].VoucherID : 0;
+                        const nextVoucherID = latestVoucherID;
+
+                        // Default values for the form
+                        const defaultData = {
+                            VoucherID: nextVoucherID, // Auto-populated VoucherID
+                            
+                            AccountDetailID: accountDetails[1]?.AccountDetailID || 1,    // Default AccountDetailID
+                            AccountTypeID: accountTypes[0]?.AccountTypeID || 1, // Default AccountTypeID
+                            ModeID: modes[0]?.ModeID || 1 // Default ModeID
+                        };
+
+                        res.render("finance_form", { action, data: defaultData, accountDetails, accountTypes, modes });
+                    });
+                } else {
+                    res.status(400).send("Invalid action.");
+                }
+
+            });
+        });
+    });    
+});
+
+// Route to handle Insert/Update logic
+app.post("/finance/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+    const { AccountDetailID, AccountTypeID, DebitAmount, CreditAmount, Narration, Notes, VoucherID } = req.body;
+
+    // Query to count entries for the same VoucherID
+    const checkQuery = "SELECT COUNT(*) AS count FROM VoucherLineT WHERE fVoucherID = ?";
+
+    connection.query(checkQuery, [VoucherID], (err, results) => {
+        if (err) {
+            console.error("Error checking entries for VoucherID:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        const entryCount = results[0].count;
+
+        if (entryCount >= 2) {
+            // Restrict further entries
+            return res.status(400).send("Cannot add more than 2 entries for the same VoucherID.");
+        }
+
+        if (action === "insert") {
+            const query = "INSERT INTO VoucherLineT (fAccountDetail, fAccountType, DebitAmount, CreditAmount, Narration, Notes, fVoucherID, IsExported) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
+            const values = [AccountDetailID, AccountTypeID, DebitAmount, CreditAmount, Narration, Notes, VoucherID];
+
+            connection.query(query, values, (err) => {
+                if (err) {
+                    console.error("Error inserting data:", err);
+                    return res.status(500).send("Internal Server Error");
+                }
+                res.redirect("/finance/insert");
+            });
+        } else if (action === "edit" && id) {
+            const updateQuery = `
+            UPDATE VoucherLineT, VoucherT 
+            SET VoucherLineT.fVoucherID = ?, fAccountDetail = ?, fAccountType = ?, DebitAmount = ?, CreditAmount = ?, Narration = ?, Notes = ?, IsExported = 0 
+            WHERE VoucherLineT.fVoucherID = VoucherT.VoucherID AND VoucherLineID = ?`;
+
+            const values = [
+                VoucherID, AccountDetailID, AccountTypeID,
+                DebitAmount, CreditAmount, Narration,
+                Notes, id
+            ];
+
+            connection.query(updateQuery, values, (err) => {
+                if (err) {
+                    console.error("Error updating data:", err);
+                    return res.status(500).send("Internal Server Error");
+                }
+                res.redirect("/finance");
+            });
+        } else {
+            res.status(400).send("Invalid action.");
+        }
+    });
+});
+
+
+//===============================Finance ID Generate=======================================
+// Render financeid table with Insert and Edit actions
+app.get("/financeid", (req, res) => {
+    const query = "SELECT VoucherID, VoucherDate, fVoucherType From vouchert ORDER BY VoucherID DESC";
+
+    connection.query(query, (err, database) => {
+        if (err) return res.status(500).send("Internal Server Error");
+
+        // Format VoucherDate for all rows
+        database.forEach(row => {
+            if (row.VoucherDate) row.VoucherDate = formatDate(row.VoucherDate);
+        });
+
+        res.render("financeid", { database });
+    });
+});
+
+// Route to render Insert/Edit form with combo box
+app.get("/financeid/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+
+    const voucherTypeQuery = "SELECT VoucherTypeID, VoucherType FROM VoucherTypeT";
+    connection.query(voucherTypeQuery, (err, voucherTypes) => {
+        if (err) {
+            console.error("Error fetching voucherTypes for combo box:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+        if (action === "edit" && id) {
+            const editQuery = `
+            SELECT VoucherID, VoucherDate, fVoucherType AS VoucherTypeID 
+            FROM vouchert 
+            WHERE VoucherID = ?`;
+            connection.query(editQuery, [id], (err, database) => {
+                if (err) {
+                    console.error("Error fetching data for edit:", err);
+                    return res.status(500).send("Internal Server Error");
+                }
+
+                if (database.length > 0) {
+                    const data = database[0];
+                    if (data.VoucherDate) data.VoucherDate = formatDate(data.VoucherDate);
+                    res.render("financeid_form", { action, data, voucherTypes });
+                } else {
+                    res.status(404).send("Record not found.");
+                }
+            });
+        } else if (action === "insert") {
+            const defaultData = {};
+            res.render("financeid_form", { action, data: defaultData, voucherTypes });
+        } else {
+            res.status(400).send("Invalid action.");
+        }
+    });
+});
+
+
+// Route to handle Insert/Update logic
+app.post("/financeid/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+    const { VoucherDate, VoucherTypeID } = req.body; // Use correct form field names
+
+    if (action === "insert") {
+        const query = "INSERT INTO vouchert (VoucherDate, fVoucherType) VALUES (?, ?)";
+        const values = [VoucherDate, VoucherTypeID];
+        
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error inserting data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/financeid");
+        });
+    } else if (action === "edit" && id) {
+        const updateQuery = `
+        UPDATE vouchert
+        SET VoucherDate = ?, fVoucherType = ? 
+        WHERE VoucherID = ?`;
+
+        const values = [VoucherDate, VoucherTypeID, id];
+        
+        connection.query(updateQuery, values, (err) => {
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/financeid");
+        });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
+
 //================Git Commands =================
 //git clone link to the repository
 //git status
