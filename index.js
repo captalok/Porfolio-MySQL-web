@@ -570,13 +570,18 @@ app.get("/finance", (req, res) => {
 });
 
 app.get("/finance/:action/:id?", (req, res) => {    
-    
     const { action, id } = req.params;
-    
+
     const accountDetailQuery = "SELECT AccountDetailID, AccountName FROM accountdetailt";
     const accountTypeQuery = "SELECT AccountTypeID, AccountType FROM accounttypet";
     const modeQuery = "SELECT ModeID, ChkMode FROM tblchkmode";
-    const voucherIDQuery = "SELECT VoucherID From vouchert ORDER BY VoucherID DESC LIMIT 1";
+    const voucherIDQuery = "SELECT VoucherID FROM vouchert ORDER BY VoucherID DESC LIMIT 1";
+    const latestNarrationNotesQuery = `
+        SELECT Narration, Notes 
+        FROM VoucherLineT 
+        ORDER BY VoucherLineID DESC 
+        LIMIT 1
+    `;
 
     connection.query(accountDetailQuery, (err, accountDetails) => {
         if (err) {
@@ -586,39 +591,40 @@ app.get("/finance/:action/:id?", (req, res) => {
 
         connection.query(accountTypeQuery, (err, accountTypes) => {
             if (err) {
-                console.error("Error fetching accounttypes for combo box:", err);
+                console.error("Error fetching accountTypes for combo box:", err);
                 return res.status(500).send("Internal Server Error");
             }
 
             connection.query(modeQuery, (err, modes) => {
-                if(err) {
+                if (err) {
                     console.error("Error fetching modes for combo box:", err);
                     return res.status(500).send("Internal Server Error");
                 }
 
                 if (action === "edit" && id) {
                     const editQuery = `
-                    SELECT 
-                        VoucherLineID, 
-                        VoucherID, 
-                        VoucherDate, 
-                        DebitAmount, 
-                        CreditAmount, 
-                        Narration, 
-                        Notes, 
-                        IsExported,
-                        VoucherLineT.fAccountDetail AS AccountDetailID, 
-                        VoucherLineT.fAccountType AS AccountTypeID 
-                    FROM VoucherLineT
-                    INNER JOIN VoucherT ON VoucherLineT.fVoucherID = VoucherT.VoucherID
-                    JOIN AccountDetailT ON VoucherLineT.fAccountDetail = AccountDetailT.AccountDetailID
-                    JOIN AccountTypeT ON VoucherLineT.fAccountType = AccountTypeT.AccountTypeID
-                    WHERE VoucherLineID = ?`;
+                        SELECT 
+                            VoucherLineID, 
+                            VoucherID, 
+                            VoucherDate, 
+                            DebitAmount, 
+                            CreditAmount, 
+                            Narration, 
+                            Notes, 
+                            IsExported,
+                            VoucherLineT.fAccountDetail AS AccountDetailID, 
+                            VoucherLineT.fAccountType AS AccountTypeID 
+                        FROM VoucherLineT
+                        INNER JOIN VoucherT ON VoucherLineT.fVoucherID = VoucherT.VoucherID
+                        JOIN AccountDetailT ON VoucherLineT.fAccountDetail = AccountDetailT.AccountDetailID
+                        JOIN AccountTypeT ON VoucherLineT.fAccountType = AccountTypeT.AccountTypeID
+                        WHERE VoucherLineID = ?`;
+
                     connection.query(editQuery, [id], (err, database) => {
                         if (err) {
                             console.error("Error fetching data for edit:", err);
                             return res.status(500).send("Internal Server Error");
-                        }                        
+                        }
 
                         if (database.length > 0) {
                             const data = database[0];
@@ -628,34 +634,42 @@ app.get("/finance/:action/:id?", (req, res) => {
                         }
                     });
                 } else if (action === "insert") {
-                    connection.query(voucherIDQuery, (err, result) => {
+                    connection.query(voucherIDQuery, (err, voucherResult) => {
                         if (err) {
-                            console.error("Error fetching latest voucherID:", err);
+                            console.error("Error fetching latest VoucherID:", err);
                             return res.status(500).send("Internal Server Error");
                         }
 
-                        const latestVoucherID = result.length > 0 ? result[0].VoucherID : 0;
-                        const nextVoucherID = latestVoucherID;
+                        const latestVoucherID = voucherResult.length > 0 ? voucherResult[0].VoucherID : 0;
 
-                        // Default values for the form
-                        const defaultData = {
-                            VoucherID: nextVoucherID, // Auto-populated VoucherID
-                            
-                            AccountDetailID: accountDetails[1]?.AccountDetailID || 1,    // Default AccountDetailID
-                            AccountTypeID: accountTypes[0]?.AccountTypeID || 1, // Default AccountTypeID
-                            ModeID: modes[0]?.ModeID || 1 // Default ModeID
-                        };
+                        connection.query(latestNarrationNotesQuery, (err, narrationNotesResult) => {
+                            if (err) {
+                                console.error("Error fetching latest Narration and Notes:", err);
+                                return res.status(500).send("Internal Server Error");
+                            }
 
-                        res.render("finance_form", { action, data: defaultData, accountDetails, accountTypes, modes });
+                            const latestNarrationNotes = narrationNotesResult[0] || { Narration: "", Notes: "" };
+
+                            // Default values for the form
+                            const defaultData = {
+                                VoucherID: latestVoucherID,
+                                AccountDetailID: accountDetails[1]?.AccountDetailID || 1, // Default AccountDetailID
+                                AccountTypeID: accountTypes[0]?.AccountTypeID || 1,    // Default AccountTypeID
+                                Narration: latestNarrationNotes.Narration,            // Pre-populated Narration
+                                Notes: latestNarrationNotes.Notes                     // Pre-populated Notes
+                            };
+
+                            res.render("finance_form", { action, data: defaultData, accountDetails, accountTypes, modes });
+                        });
                     });
                 } else {
                     res.status(400).send("Invalid action.");
                 }
-
             });
         });
-    });    
+    });
 });
+
 
 // Route to handle Insert/Update logic
 app.post("/finance/:action/:id?", (req, res) => {
