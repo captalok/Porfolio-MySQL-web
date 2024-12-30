@@ -26,7 +26,14 @@
                 <!-- Document Path -->
                 <div class="mb-3">
                     <label for="DocPath" class="form-label">Document Path</label>
-                    <input type="text" id="DocPath" name="DocPath" class="form-control" value="<%= data.DocPath || '' %>">
+                    <input
+                        type="text"
+                        id="DocPath"
+                        name="DocPath"
+                        class="form-control"
+                        value="<%= data.DocPath || '' %>"
+                        readonly  <!-- Makes the field uneditable -->
+                    
                 </div>
 
                 <!-- Document Text -->
