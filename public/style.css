@@ -198,3 +198,13 @@ a:hover {
         padding: 10px;
     }
 }
+
+.action-buttons {
+    display: flex;
+    align-items: center;
+}
+
+.action-buttons a {
+    margin-right: 8px; /* Adjust spacing as needed */
+}
+

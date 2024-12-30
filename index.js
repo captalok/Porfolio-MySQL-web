@@ -247,6 +247,45 @@ app.get("/document", (req, res) => {
         
 });
 
+const fs = require("fs");
+
+// Route to handle "Open" action
+app.get("/document/open/:id", (req, res) => {
+    const { id } = req.params;
+
+    const query = "SELECT DocPath FROM DocT WHERE DocID = ?";
+    connection.query(query, [id], (err, results) => {
+        if (err) {
+            console.error("Error fetching document path:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        if (results.length > 0) {
+            const filePath = results[0].DocPath;
+
+            // Verify file exists
+            const fullPath = path.resolve(filePath);
+            fs.access(fullPath, fs.constants.F_OK, (err) => {
+                if (err) {
+                    console.error("File not found:", fullPath);
+                    return res.status(404).send("File not found.");
+                }
+
+                // Send the file to the client
+                res.download(fullPath, path.basename(fullPath), (err) => {
+                    if (err) {
+                        console.error("Error sending file:", err);
+                        res.status(500).send("Error serving file.");
+                    }
+                });
+            });
+        } else {
+            res.status(404).send("Document not found.");
+        }
+    });
+});
+
+
 // Route to render Insert/Edit form with combo box
 app.get("/document/:action/:id?", (req, res) => {
     const { action, id } = req.params;
@@ -317,6 +356,7 @@ app.post("/document/:action/:id?", (req, res) => {
         res.status(400).send("Invalid action.");
     }
 });
+
 
 //===============================Trades=========================================
 // Render trade table with Insert and Edit actions

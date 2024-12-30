@@ -16,17 +16,16 @@
 
     <!-- Header and Search Container -->
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="text-center">Document</h1>
+        <h1 class="text-center">Document Edit</h1>
         <a href="/" class="btn btn-primary">Home</a>
         <a href="/dashboard" class="btn btn-info">Dashboard</a>
         <input type="text" id="searchBox" class="form-control w-25" placeholder="Search...">        
     </div>   
 
     <div class="table-container">
-        
         <!-- Insert Button -->
         <a href="/document/insert" class="btn btn-success mb-3">Add New Document</a>
-
+    
         <!-- Table -->
         <table id="dataTable" class="table table-bordered table-striped">
             <thead>
@@ -47,15 +46,21 @@
                         <% Object.values(row).forEach(value => { %>
                             <td><%= value %></td>
                         <% }); %>
-                        <td>
+                        <td class="action-buttons">
+                            <!-- Open Button -->
+                            <a href="/document/open/<%= row.DocID %>" class="btn btn-primary btn-sm">Open</a>
+                        
                             <!-- Edit Button -->
                             <a href="/document/edit/<%= row.DocID %>" class="btn btn-warning btn-sm">Edit</a>
-                        </td>
+                        </td>                      
+                                                                        
+                        
                     </tr>
                 <% }); %>
             </tbody>
         </table>
     </div>
+    
 
     <!-- JavaScript for Filtering Table Data -->
     <script>
