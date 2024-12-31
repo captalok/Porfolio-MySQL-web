@@ -13,7 +13,7 @@ const mysql = require ("mysql2");
 const connection = mysql.createConnection({
     host : "localhost",
     user : "root",
-    database : "universalportfolio",
+    database : "portfoliomysql",
     password : "&&Alok&&24"
 });
 
@@ -859,6 +859,12 @@ app.post("/financeid/:action/:id?", (req, res) => {
     } else {
         res.status(400).send("Invalid action.");
     }
+});
+
+//===============================Calculator===================================
+// Route for the calculator
+app.get('/calculator', (req, res) => {
+    res.render('calculator');
 });
 
 //================Git Commands =================

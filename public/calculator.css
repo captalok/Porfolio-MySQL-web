@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #1e1e2f;
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+#app {
+    width: 90%;
+    max-width: 1200px;
+    background-color: #2b2b40;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+#calculator {
+    display: flex;
+    justify-content: space-between;
+}
+
+.input-section {
+    width: 70%;
+}
+
+.input-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+}
+
+.input-group label {
+    font-size: 12px;
+    margin-bottom: 5px;
+}
+
+.input-group input {
+    width: 100px;
+    padding: 5px;
+    border: 1px solid #555;
+    border-radius: 4px;
+    background-color: #444;
+    color: #fff;
+}
+
+.right-section {
+    width: 25%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+}
+
+button {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    background-color: #ff9800;
+    color: #fff;
+    cursor: pointer;
+    align-self: flex-start;
+}
+
+button:hover {
+    background-color: #e68a00;
+}
+
+.results {
+    width: 100%;
+    border-top: 1px solid #555;
+    padding-top: 10px;
+}
+
+.results h3 {
+    margin-bottom: 10px;
+}
+
+.results .input-group {
+    margin-bottom: 10px;
+}
+
+.results .input-group input {
+    width: 150px;
+}
+
+h1 {
+    
+    /* margin-bottom: 20px; */
+    margin-top: 70px; /* Added margin-top for spacing */
+}

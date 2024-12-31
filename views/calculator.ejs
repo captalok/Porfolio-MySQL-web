@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Calculator</title>
+    <link rel="stylesheet" href="/calculator.css">
+</head>
+<body>
+    <div id="app">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            
+            <h1 class="text-center">Trade Calculator</h1>                    
+        </div>   
+        
+        <div id="calculator">
+            <div class="input-section">
+                <% for (let i = 1; i <= 10; i++) { %>
+                <div class="input-row">
+                    <div class="input-group">
+                        <label for="buyQty<%= i %>">Buy Qty <%= i %>:</label>
+                        <input type="number" id="buyQty<%= i %>" />
+                    </div>
+                    <div class="input-group">
+                        <label for="buyValue<%= i %>">Buy Value <%= i %>:</label>
+                        <input type="number" id="buyValue<%= i %>" />
+                    </div>
+                    <div class="input-group">
+                        <label for="sellQty<%= i %>">Sell Qty <%= i %>:</label>
+                        <input type="number" id="sellQty<%= i %>" />
+                    </div>
+                    <div class="input-group">
+                        <label for="sellValue<%= i %>">Sell Value <%= i %>:</label>
+                        <input type="number" id="sellValue<%= i %>" />
+                    </div>
+                </div>
+                <% } %>
+            </div>
+
+            <div class="right-section">
+                <div style="text-align: right; margin-top: 10px;">
+                    <button type="button" id="calculate" style="margin-right: 10px;">Calculate</button>
+                    <button type="button" id="reset">Reset</button>
+                </div>
+                <div class="results">
+                    <h3>Results</h3>
+                    <div class="input-group">
+                        <label for="totalBuyAmount">Total Buy Amount:</label>
+                        <input type="text" id="totalBuyAmount" readonly />
+                    </div>
+                    <div class="input-group">
+                        <label for="totalSellAmount">Total Sell Amount:</label>
+                        <input type="text" id="totalSellAmount" readonly />
+                    </div>
+                    <div class="input-group">
+                        <label for="totalBuyQuantity">Total Buy Quantity:</label>
+                        <input type="text" id="totalBuyQuantity" readonly />
+                    </div>
+                    <div class="input-group">
+                        <label for="totalSellQuantity">Total Sell Quantity:</label>
+                        <input type="text" id="totalSellQuantity" readonly />
+                    </div>
+                    <div class="input-group">
+                        <label for="averageBuyValue">Average Buy Value:</label>
+                        <input type="text" id="averageBuyValue" readonly />
+                    </div>
+                    <div class="input-group">
+                        <label for="averageSellValue">Average Sell Value:</label>
+                        <input type="text" id="averageSellValue" readonly />
+                    </div>
+                    <div class="input-group">
+                        <label for="totalProfit">Total Profit:</label>
+                        <input type="text" id="totalProfit" readonly />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/calculator.js"></script>
+</body>
+</html>
