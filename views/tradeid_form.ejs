@@ -33,6 +33,17 @@
             </form>
         </div>
     </div>
+    <script>
+        // Populate the ApptStart field with the current date
+        document.addEventListener('DOMContentLoaded', () => {
+            const buyDateField = document.getElementById('BuyDate');
+            if (buyDateField && !buyDateField.value) {
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
+                buyDateField.value = formattedDate;
+            }
+        });
+    </script>
 </body>
 
 </html>

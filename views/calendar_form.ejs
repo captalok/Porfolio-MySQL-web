@@ -61,6 +61,28 @@
             </form>
         </div>
     </div>
+    <script>
+        // Populate the ApptStart field with the current date
+        document.addEventListener('DOMContentLoaded', () => {
+            const apptStartField = document.getElementById('ApptStart');
+            if (apptStartField && !apptStartField.value) {
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
+                apptStartField.value = formattedDate;
+            }
+        });
+    </script>
+    <script>
+        // Populate the ApptEnd field with the current date
+        document.addEventListener('DOMContentLoaded', () => {
+            const apptEndField = document.getElementById('ApptEnd');
+            if (apptEndField && !apptEndField.value) {
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
+                apptEndField.value = formattedDate;
+            }
+        });
+    </script>
 </body>
 
 </html>

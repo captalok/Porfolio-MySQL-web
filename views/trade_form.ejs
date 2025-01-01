@@ -108,6 +108,36 @@
             </form>
         </div>
     </div>
+    <script>
+        document.getElementById('Brokerage').addEventListener('focus', () => {
+            const buyQty = parseFloat(document.getElementById('BuyQty').value) || 0;
+            const buyPrice = parseFloat(document.getElementById('BuyPrice').value) || 0;
+            const sellQty = parseFloat(document.getElementById('BuyQty').value) || 0;
+            
+    
+            // Calculate total buy and sell amounts
+            const totalBuyAmount = buyQty * buyPrice;
+            const totalSellAmount = sellQty * buyPrice;
+    
+            // Calculate brokerage
+            const brokerage = ((totalBuyAmount + totalSellAmount) * 0.0999999 / 100) + 20;
+    
+            // Display calculated brokerage in the Brokerage input field
+            document.getElementById('Brokerage').value = brokerage.toFixed(2);
+        });
+    </script>
+    <script>
+        // Populate the SellDate field with the current date
+        document.addEventListener('DOMContentLoaded', () => {
+            const sellDateField = document.getElementById('SellDate');
+            if (sellDateField && !sellDateField.value) {
+                const today = new Date();
+                const formattedDate = today.toISOString().split('T')[0]; // Format the date as yyyy-mm-dd
+                sellDateField.value = formattedDate;
+            }
+        });
+    </script>
+    
 </body>
 
 </html>
