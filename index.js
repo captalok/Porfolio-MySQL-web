@@ -63,6 +63,8 @@ app.get("/user/:page", (req, res) => {
 
         daily_consolidated: { query: "SELECT * from daily_consolidated", title: "Daily Trades" },
 
+        demat: { query: "SELECT BuyDate, sum_qty, sum_pips, sum_profit, sum_deposit, sum_brokerage, run_demat, run_deposit, run_pips, run_brokerage FROM demat_holding", title: "Demat" },
+
         mly_trades: { query: "SELECT Trade_year,Trade_Month, profit, sBrokerage, sPips, sDepositWithdrawal from mly_trades", title: "Monthly Trades" },
 
         yearly_trades: { query: "SELECT * from yearly_trades", title: "Yearly Trades" },
