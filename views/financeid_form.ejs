@@ -15,7 +15,11 @@
 <body>
     <div class="container">
         <div class="form-container">
-            <h1><%= action === "insert" ? "Add New Finance ID" : "Edit Finance ID" %></h1>
+            <div>
+                <h1><%= action === "insert" ? "Add New Finance ID" : "Edit Finance ID" %></h1>
+                <a href="/finance/insert" class="btn btn-success mb-3">Add New Finance Entry</a>                
+            </div>
+            
             <form action="/financeid/<%= action %><%= action === 'edit' ? `/${data.VoucherID}` : '' %>" method="POST">               
                 
 
