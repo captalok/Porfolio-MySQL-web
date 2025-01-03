@@ -27,7 +27,7 @@
         <a href="/document/insert" class="btn btn-success mb-3">Add New Document</a>
     
         <!-- Table -->
-        <table id="dataTable" class="table table-bordered table-striped">
+        <table id="dataTable" class="table table-bordered table-striped table-dark">
             <thead>
                 <tr>
                     <% if (database.length > 0) { %>
@@ -43,8 +43,25 @@
             <tbody>
                 <% database.forEach(row => { %>
                     <tr>
-                        <% Object.values(row).forEach(value => { %>
-                            <td><%= value %></td>
+                        <% Object.entries(row).forEach(([key, value]) => { %>
+                            <td 
+                                <% if (key === 'DocPath') { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'DocName') { %>
+                                    style="color: yellow; font-weight: bold;"
+                                <% } else if (key === 'DocUserName' && value === 'Alok') { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'DocUserName' && value === 'PaySlip') { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'DocUserName' && value === 'Akash') { %>
+                                    style="color: yellow; font-weight: bold;"
+                                <% } else if (key === 'DocUserName' && value === 'Aryan') { %>
+                                    style="color: grey; font-weight: bold;"
+                                
+                                <% } else { %>
+                                    style="color: white;"
+                                <% } %>
+                            ><%= value %></td>
                         <% }); %>
                         <td class="action-buttons">
                             <!-- Open Button -->

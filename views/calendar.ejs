@@ -29,7 +29,7 @@
         <a href="/calendar/insert" class="btn btn-success mb-3">Add New Appointment</a>
 
         <!-- Table -->
-        <table id="dataTable" class="table table-bordered table-striped">
+        <table id="dataTable" class="table table-bordered table-striped table-dark">
             <thead>
                 <tr>
                     <% if (database.length > 0) { %>
@@ -45,8 +45,21 @@
             <tbody>
                 <% database.forEach(row => { %>
                     <tr>
-                        <% Object.values(row).forEach(value => { %>
-                            <td><%= value %></td>
+                        <% Object.entries(row).forEach(([key, value]) => { %>
+                            <td 
+                                <% if (key === 'ApptSubject') { %>
+                                    style="color: yellow; font-weight: bold;"
+                                <% } else if (key === 'ApptNotes') { %>
+                                    style="color: yellow; font-weight: bold;"
+                                <% } else if (key === 'ApptLocation' && value === 'Trades') { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'ApptLocation' && value === 'Finance') { %>
+                                    style="color: green; font-weight: bold;"
+                                
+                                <% } else { %>
+                                    style="color: white;"
+                                <% } %>
+                            ><%= value %></td>
                         <% }); %>
                         <td>
                             <!-- Edit Button -->

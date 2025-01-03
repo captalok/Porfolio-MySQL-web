@@ -23,20 +23,19 @@
     </div>   
 
     <div class="table-container">
-        
-        <!-- Insert Button -->
+        <!-- Insert Buttons -->
         <a href="/finance/insert" class="btn btn-success mb-3">Add New Finance Entry</a>
         <a href="/financeid/insert" class="btn btn-success mb-3">Add New Finance ID</a>
-
+    
         <!-- Table -->
-        <table id="dataTable" class="table table-bordered table-striped">
+        <table id="dataTable" class="table table-bordered table-striped table-dark">
             <thead>
                 <tr>
                     <% if (database.length > 0) { %>
                         <% Object.keys(database[0]).forEach(key => { %>
                             <th><%= key %></th>
                         <% }); %>
-                        <th>Actions</th> <!-- Actions Column -->
+                        <th>Actions</th>
                     <% } else { %>
                         <th colspan="100%">No Records Found</th>
                     <% } %>
@@ -45,18 +44,36 @@
             <tbody>
                 <% database.forEach(row => { %>
                     <tr>
-                        <% Object.values(row).forEach(value => { %>
-                            <td><%= value %></td>
+                        <% Object.entries(row).forEach(([key, value]) => { %>
+                            <td 
+                                <% if (key === 'DebitAmount') { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'CreditAmount') { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'AccountName' && value === 'Purchases') { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'AccountName' && value === 'Credit Card') { %>
+                                    style="color: yellow; font-weight: bold;"
+                                <% } else if (key === 'VoucherType' && value === 'Receipt') { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'VoucherType' && value === 'Payment') { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else { %>
+                                    style="color: white;"
+                                <% } %>
+                            ><%= value %></td>
                         <% }); %>
                         <td>
-                            <!-- Edit Button -->
                             <a href="/finance/edit/<%= row.VoucherLineID %>" class="btn btn-warning btn-sm">Edit</a>
                         </td>
                     </tr>
                 <% }); %>
             </tbody>
         </table>
+                
+        
     </div>
+    
 
     <!-- JavaScript for Filtering Table Data -->
     <script>

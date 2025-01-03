@@ -30,7 +30,7 @@
         
 
         <!-- Table -->
-        <table id="dataTable" class="table table-bordered table-striped">
+        <table id="dataTable" class="table table-bordered table-striped table-dark">
             <thead>
                 <tr>
                     <% if (database.length > 0) { %>
@@ -46,8 +46,28 @@
             <tbody>
                 <% database.forEach(row => { %>
                     <tr>
-                        <% Object.values(row).forEach(value => { %>
-                            <td><%= value %></td>
+                        <% Object.entries(row).forEach(([key, value]) => { %>
+                            <td 
+                                <% if (key === 'Brokerage') { %>
+                                    style="color: yellow; font-weight: bold;"
+                                <% } else if (key === 'BuyPrice') { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'SellPrice') { %>
+                                    style="color: Red; font-weight: bold;"
+                                <% } else if (key === 'DepositWithdrawal' && value < 0) { %>
+                                    style="color: green; font-weight: bold;"
+                                
+                                <% } else if (key === 'DepositWithdrawal' && value > 0) { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'GrossProfit' && value > 0) { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'GrossProfit' && value < 0) { %>
+                                    style="color: red; font-weight: bold;"
+                                
+                                <% } else { %>
+                                    style="color: white;"
+                                <% } %>
+                            ><%= value %></td>
                         <% }); %>
                         <td>
                             <!-- Edit Button -->

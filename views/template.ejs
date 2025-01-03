@@ -22,7 +22,7 @@
     </div>   
         
     <div class="table-container">
-        <table id="dataTable" class="table table-bordered table-striped">
+        <table id="dataTable" class="table table-bordered table-striped table-dark">
             <thead>
                 <tr>
                     <% if (database.length > 0) { %>
@@ -35,14 +35,37 @@
             <tbody>
                 <% database.forEach(row => { %>
                     <tr>
-                        <% Object.values(row).forEach(value => { %>
-                            <% if (typeof value === 'number') { %>
-                                <td class="<%= value >= 0 ? 'text-green' : 'text-red' %>">
-                                    <%= value %>
-                                </td>
-                            <% } else { %>
-                                <td><%= value %></td>
-                            <% } %>
+                        <% Object.entries(row).forEach(([key, value]) => { %>
+                            <td 
+                                <% if (key === 'DebitAmount') { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'CreditAmount') { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'WebsiteName') { %>
+                                    style="color: Yellow; font-weight: bold;"
+                                <% } else if (key === 'Narration') { %>
+                                    style="color: Yellow; font-weight: bold;"
+                                <% } else if (key === 'ApptLocation' && value === 'Trades') { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'ApptLocation' && value === 'Finance') { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'GrossProfit' && value > 0) { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'GrossProfit' && value < 0) { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'DepositWithdrawal' && value > 0) { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'sum_profit' && value < 0) { %>
+                                    style="color: red; font-weight: bold;"
+                                <% } else if (key === 'sum_profit' && value > 0) { %>
+                                    style="color: green; font-weight: bold;"
+                                <% } else if (key === 'sum_deposit' && value > 0) { %>
+                                    style="color: red; font-weight: bold;"
+                                
+                                <% } else { %>
+                                    style="color: white;"
+                                <% } %>
+                            ><%= value %></td>
                         <% }); %>
                     </tr>
                 <% }); %>
