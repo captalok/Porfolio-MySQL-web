@@ -38,36 +38,48 @@
                         <% Object.entries(row).forEach(([key, value]) => { %>
                             <td 
                                 <% if (key === 'DebitAmount') { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #D32F2F; font-weight: bold;"
                                 <% } else if (key === 'CreditAmount') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #81C784; font-weight: bold;"
+                                <% } else if (key === 'AccountName') { %>
+                                    style="color: #9575CD; font-weight: bold;"
+                                <% } else if (key === 'AccountType') { %>
+                                    style="color: #FFB74D; font-weight: bold;"
                                 <% } else if (key === 'WebsiteName') { %>
-                                    style="color: Yellow; font-weight: bold;"
+                                    style="color: #FFB74D; font-weight: bold;"
                                 <% } else if (key === 'Narration') { %>
-                                    style="color: Yellow; font-weight: bold;"
+                                    style="color: #2196F3; font-weight: bold;"
+                                <% } else if (key === 'ApptSubject') { %>
+                                    style="color: #64B5F6; font-weight: bold;"
+                                <% } else if (key === 'ApptNotes') { %>
+                                    style="color: #2196F3; font-weight: bold;"
                                 <% } else if (key === 'run_demat') { %>
-                                    style="color: Yellow; font-weight: bold;"
+                                    style="color: #EF5350; font-weight: bold;"
                                 <% } else if (key === 'run_deposit') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #FFCA28; font-weight: bold;"
+                                <% } else if (key === 'BuyPrice') { %>
+                                    style="color: #388E3C; font-weight: bold;"
+                                <% } else if (key === 'SellPrice') { %>
+                                    style="color: #E91E63; font-weight: bold;"
                                 <% } else if (key === 'ApptLocation' && value === 'Trades') { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #E91E63; font-weight: bold;"
                                 <% } else if (key === 'ApptLocation' && value === 'Finance') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #FFB74D; font-weight: bold;"
                                 <% } else if (key === 'GrossProfit' && value > 0) { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #81C784; font-weight: bold;"
                                 <% } else if (key === 'GrossProfit' && value < 0) { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #EF5350; font-weight: bold;"
                                 <% } else if (key === 'DepositWithdrawal' && value > 0) { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #E91E63; font-weight: bold;"
                                 <% } else if (key === 'sum_profit' && value < 0) { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #00695C; font-weight: bold;"
                                 <% } else if (key === 'sum_profit' && value > 0) { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #9575CD; font-weight: bold;"
                                 <% } else if (key === 'sum_deposit' && value > 0) { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #D32F2F; font-weight: bold;"
                                 
                                 <% } else { %>
-                                    style="color: white;"
+                                    style="color: #F5F5F5;"
                                 <% } %>
                             ><%= value %></td>
                         <% }); %>

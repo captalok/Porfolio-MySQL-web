@@ -48,16 +48,16 @@
                         <% Object.entries(row).forEach(([key, value]) => { %>
                             <td 
                                 <% if (key === 'ApptSubject') { %>
-                                    style="color: yellow; font-weight: bold;"
+                                    style="color: #E91E63; font-weight: bold;"
                                 <% } else if (key === 'ApptNotes') { %>
-                                    style="color: yellow; font-weight: bold;"
+                                    style="color: #26A69A; font-weight: bold;"
                                 <% } else if (key === 'ApptLocation' && value === 'Trades') { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #FFB74D; font-weight: bold;"
                                 <% } else if (key === 'ApptLocation' && value === 'Finance') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #81C784; font-weight: bold;"
                                 
                                 <% } else { %>
-                                    style="color: white;"
+                                    style="color: #F5F5F5;"
                                 <% } %>
                             ><%= value %></td>
                         <% }); %>

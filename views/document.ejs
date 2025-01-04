@@ -46,20 +46,19 @@
                         <% Object.entries(row).forEach(([key, value]) => { %>
                             <td 
                                 <% if (key === 'DocPath') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #26A69A; font-weight: bold;" 
                                 <% } else if (key === 'DocName') { %>
-                                    style="color: yellow; font-weight: bold;"
+                                    style="color: #FFD54F; font-weight: bold;" 
                                 <% } else if (key === 'DocUserName' && value === 'Alok') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #64B5F6; font-weight: bold;" 
                                 <% } else if (key === 'DocUserName' && value === 'PaySlip') { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #EF5350; font-weight: bold;" 
                                 <% } else if (key === 'DocUserName' && value === 'Akash') { %>
-                                    style="color: yellow; font-weight: bold;"
+                                    style="color: #81C784; font-weight: bold;" 
                                 <% } else if (key === 'DocUserName' && value === 'Aryan') { %>
-                                    style="color: grey; font-weight: bold;"
-                                
+                                    style="color: #9575CD; font-weight: bold;" 
                                 <% } else { %>
-                                    style="color: white;"
+                                    style="color: #CFD8DC;" 
                                 <% } %>
                             ><%= value %></td>
                         <% }); %>
@@ -70,12 +69,11 @@
                             <!-- Edit Button -->
                             <a href="/document/edit/<%= row.DocID %>" class="btn btn-warning btn-sm">Edit</a>
                         </td>                      
-                                                                        
-                        
                     </tr>
                 <% }); %>
             </tbody>
         </table>
+        
     </div>
     
 

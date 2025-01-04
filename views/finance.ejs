@@ -47,19 +47,27 @@
                         <% Object.entries(row).forEach(([key, value]) => { %>
                             <td 
                                 <% if (key === 'DebitAmount') { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #26A69A; font-weight: bold;"
                                 <% } else if (key === 'CreditAmount') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #64B5F6; font-weight: bold;"
+                                <% } else if (key === 'AccountType') { %>
+                                    style="color: #F48FB1; font-weight: bold;"
+                                <% } else if (key === 'Narration') { %>
+                                    style="color: #9575CD; font-weight: bold;"
+                                <% } else if (key === 'Notes') { %>
+                                    style="color: #9575CD; font-weight: bold;"
                                 <% } else if (key === 'AccountName' && value === 'Purchases') { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #EF5350; font-weight: bold;"
+                                <% } else if (key === 'AccountName' && value === 'Bank') { %>
+                                    style="color: #FF7043; font-weight: bold;"
                                 <% } else if (key === 'AccountName' && value === 'Credit Card') { %>
-                                    style="color: yellow; font-weight: bold;"
+                                    style="color: #D32F2F; font-weight: bold;"
                                 <% } else if (key === 'VoucherType' && value === 'Receipt') { %>
-                                    style="color: green; font-weight: bold;"
+                                    style="color: #388E3C; font-weight: bold;"
                                 <% } else if (key === 'VoucherType' && value === 'Payment') { %>
-                                    style="color: red; font-weight: bold;"
+                                    style="color: #E91E63; font-weight: bold;"
                                 <% } else { %>
-                                    style="color: white;"
+                                    style="color: #F5F5F5;"
                                 <% } %>
                             ><%= value %></td>
                         <% }); %>
