@@ -158,8 +158,15 @@ h1.text-center {
     margin: 10px;
 }
 
+
+.btn:hover {
+    background-color: #3700b3; /* Darker purple on hover */
+    color: #e0e0e0;
+    transform: scale(1.05);
+}
+
 .btnEdit {
-    background-color: #00695C; /* Purple primary button */
+    background-color: #81C784; /* Purple primary button */
     color: #ffffff;
     border: none;
     padding: 10px 20px;
@@ -172,21 +179,22 @@ h1.text-center {
     margin: 10px;
 }
 
-.btn:hover {
-    background-color: #3700b3; /* Darker purple on hover */
+
+.btnEdit:hover {
+    background-color: #388E3C; /* Darker purple on hover */
     color: #e0e0e0;
     transform: scale(1.05);
 }
 
 /* Links */
 a {
-    color: #bb86fc; /* Light purple */
+    color: #D32F2F; /* Light purple */
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 a:hover {
-    color: #9b5fe0; /* Slightly brighter purple */
+    color: #D32F2F; /* Slightly brighter purple */
 }
 
 .text-green {
