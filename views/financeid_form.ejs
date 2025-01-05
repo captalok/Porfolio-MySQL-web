@@ -16,8 +16,7 @@
     <div class="container">
         <div class="form-container">
             <div>
-                <h1><%= action === "insert" ? "Add New Finance ID" : "Edit Finance ID" %></h1>
-                <a href="/finance/insert" class="btn btn-success mb-3">Add New Finance Entry</a>                
+                <h1><%= action === "insert" ? "Add New Finance ID" : "Edit Finance ID" %></h1>                                
             </div>
             
             <form action="/financeid/<%= action %><%= action === 'edit' ? `/${data.VoucherID}` : '' %>" method="POST">               
@@ -40,13 +39,22 @@
                 </div>    
 
                 <!-- Submit Button -->
-                <button type="submit" class="btn btn-primary"><%= action === "insert" ? "Generate Finance ID" : "Save Changes" %></button>
+                <button type="submit" class="btn btn-primary"><%= action === "insert" ? "Generate Finance ID" : "Save Changes" %></button>                
 
-                <!-- Cancel Button -->
-                <a href="/financeid" class="btn btn-secondary mt-3">Cancel</a>
+                <!-- Action Buttons -->
+                <div class="form-actions">                    
+                    <a href="/financeid" class="btn btn-secondary mt-3">Cancel</a>
+                </div>
             </form>
         </div>
     </div>
+
+    <!-- JavaScript to Set Focus -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("VoucherTypeID").focus();
+        });
+    </script>
     <script>
         // Populate the SellDate field with the current date
         document.addEventListener('DOMContentLoaded', () => {

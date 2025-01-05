@@ -568,7 +568,7 @@ app.post("/tradeid/:action/:id?", (req, res) => {
                 console.error("Error inserting data:", err);
                 return res.status(500).send("Internal Server Error");
             }
-            res.redirect("/tradeid");
+            res.redirect("/trade/insert");
         });
     } else if (action === "edit" && id) {
         const updateQuery = `
@@ -718,23 +718,24 @@ app.post("/finance/:action/:id?", (req, res) => {
     const { action, id } = req.params;
     const { AccountDetailID, AccountTypeID, DebitAmount, CreditAmount, Narration, Notes, VoucherID } = req.body;
 
-    // Query to count entries for the same VoucherID
-    const checkQuery = "SELECT COUNT(*) AS count FROM VoucherLineT WHERE fVoucherID = ?";
+    if (action === "insert") {
+        // Query to count entries for the same VoucherID
+        const checkQuery = "SELECT COUNT(*) AS count FROM VoucherLineT WHERE fVoucherID = ?";
 
-    connection.query(checkQuery, [VoucherID], (err, results) => {
-        if (err) {
-            console.error("Error checking entries for VoucherID:", err);
-            return res.status(500).send("Internal Server Error");
-        }
+        connection.query(checkQuery, [VoucherID], (err, results) => {
+            if (err) {
+                console.error("Error checking entries for VoucherID:", err);
+                return res.status(500).send("Internal Server Error");
+            }
 
-        const entryCount = results[0].count;
+            const entryCount = results[0].count;
 
-        if (entryCount >= 2) {
-            // Restrict further entries
-            return res.status(400).send("Cannot add more than 2 entries for the same VoucherID.");
-        }
+            if (entryCount >= 2) {
+                // Restrict further entries
+                return res.status(400).send("Cannot add more than 2 entries for the same VoucherID.");
+            }
 
-        if (action === "insert") {
+            // Proceed with insert logic
             const query = "INSERT INTO VoucherLineT (fAccountDetail, fAccountType, DebitAmount, CreditAmount, Narration, Notes, fVoucherID, IsExported) VALUES (?, ?, ?, ?, ?, ?, ?, 0)";
             const values = [AccountDetailID, AccountTypeID, DebitAmount, CreditAmount, Narration, Notes, VoucherID];
 
@@ -745,30 +746,32 @@ app.post("/finance/:action/:id?", (req, res) => {
                 }
                 res.redirect("/finance/insert");
             });
-        } else if (action === "edit" && id) {
-            const updateQuery = `
-            UPDATE VoucherLineT, VoucherT 
-            SET VoucherLineT.fVoucherID = ?, fAccountDetail = ?, fAccountType = ?, DebitAmount = ?, CreditAmount = ?, Narration = ?, Notes = ?, IsExported = 0 
-            WHERE VoucherLineT.fVoucherID = VoucherT.VoucherID AND VoucherLineID = ?`;
+        });
+    } else if (action === "edit" && id) {
+        // Skip the "more than 2 entries" check for edit
+        const updateQuery = `
+        UPDATE VoucherLineT 
+        SET fVoucherID = ?, fAccountDetail = ?, fAccountType = ?, DebitAmount = ?, CreditAmount = ?, Narration = ?, Notes = ?, IsExported = 0 
+        WHERE VoucherLineID = ?`;
 
-            const values = [
-                VoucherID, AccountDetailID, AccountTypeID,
-                DebitAmount, CreditAmount, Narration,
-                Notes, id
-            ];
+        const values = [
+            VoucherID, AccountDetailID, AccountTypeID,
+            DebitAmount, CreditAmount, Narration,
+            Notes, id
+        ];
 
-            connection.query(updateQuery, values, (err) => {
-                if (err) {
-                    console.error("Error updating data:", err);
-                    return res.status(500).send("Internal Server Error");
-                }
-                res.redirect("/finance");
-            });
-        } else {
-            res.status(400).send("Invalid action.");
-        }
-    });
+        connection.query(updateQuery, values, (err) => {
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/finance");
+        });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
 });
+
 
 
 //===============================Finance ID Generate=======================================
@@ -841,7 +844,7 @@ app.post("/financeid/:action/:id?", (req, res) => {
                 console.error("Error inserting data:", err);
                 return res.status(500).send("Internal Server Error");
             }
-            res.redirect("/financeid");
+            res.redirect("/finance/insert");
         });
     } else if (action === "edit" && id) {
         const updateQuery = `

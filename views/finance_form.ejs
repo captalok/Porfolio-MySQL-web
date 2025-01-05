@@ -30,20 +30,6 @@
                             <input type="int" id="VoucherID" name="VoucherID" class="form-control bg-dark text-light" value="<%= data.VoucherID || '' %>" required>
                         </div>
 
-                        <!-- AccountTypeID Combo Box -->
-                        <div class="mb-3">
-                            <label for="AccountTypeID" class="form-label">Account Type</label>
-                            <select id="AccountTypeID" name="AccountTypeID" class="form-control bg-dark text-light">
-                                <% accountTypes.forEach(accountType => { %>
-                                    <option 
-                                        value="<%= accountType.AccountTypeID %>" 
-                                        <%= accountType.AccountTypeID === data.AccountTypeID ? 'selected' : '' %>>
-                                        <%= accountType.AccountType %>
-                                    </option>
-                                <% }); %>
-                            </select>
-                        </div>
-
                         <!-- AccountDetailID Combo Box -->
                         <div class="mb-3">
                             <label for="AccountDetailID" class="form-label">Account Detail</label>
@@ -56,7 +42,21 @@
                                     </option>
                                 <% }); %>
                             </select>
-                        </div>                        
+                        </div>
+
+                        <!-- AccountTypeID Combo Box -->
+                        <div class="mb-3">
+                            <label for="AccountTypeID" class="form-label">Account Type</label>
+                            <select id="AccountTypeID" name="AccountTypeID" class="form-control bg-dark text-light">
+                                <% accountTypes.forEach(accountType => { %>
+                                    <option 
+                                        value="<%= accountType.AccountTypeID %>" 
+                                        <%= accountType.AccountTypeID === data.AccountTypeID ? 'selected' : '' %>>
+                                        <%= accountType.AccountType %>
+                                    </option>
+                                <% }); %>
+                            </select>
+                        </div>                                                
                         
                     </div>
 
@@ -82,18 +82,26 @@
                         <!-- Notes -->
                         <div class="mb-3">
                             <label for="Notes" class="form-label">Notes</label>
-                            <textarea id="Notes" name="Notes" class="form-control bg-dark text-light" rows="2" required><%= data.Notes || '' %></textarea>
+                            <input type="text" id="Notes" name="Notes" class="form-control bg-dark text-light" value="<%= data.Narration || '' %>" required>
                         </div>
                     </div>
-                </div>
+                </div>                
 
-                <!-- Buttons -->
-                <div class="d-flex justify-content-between mt-4">                    
-                    <a href="/finance" class="btn btn-secondary px-4">Cancel</a>
+                <!-- Action Buttons -->
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary"><%= action === "insert" ? "Add Finance" : "Save Changes" %></button>
+                    <a href="/finance" class="btn btn-primary">Cancel</a>
                 </div>
             </form>
         </div>
     </div>
+
+    <!-- JavaScript to Set Focus -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("AccountDetailID").focus();
+        });
+    </script>
 
     <style>
         body {

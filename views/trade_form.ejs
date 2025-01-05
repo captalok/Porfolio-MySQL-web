@@ -109,6 +109,13 @@
         </div>
     </div>
 
+    <!-- JavaScript to Set Focus -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById("BuyQty").focus();
+        });
+    </script>
+
     <script>
         document.getElementById('Brokerage').addEventListener('focus', () => {
             const buyQty = parseFloat(document.getElementById('BuyQty').value) || 0;
