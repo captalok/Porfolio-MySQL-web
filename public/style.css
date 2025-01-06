@@ -230,3 +230,10 @@ a:hover {
     margin-right: 8px; /* Adjust spacing as needed */
 }
 
+/* Additional styles for logout button */
+.logout-button {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+}
+

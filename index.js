@@ -44,9 +44,9 @@ app.listen(port, () => {
 
 // //  =============================================
 
-// ======================= homepage =================
-app.get("/",(req,res) =>{
-    res.render("home")
+// ======================= Home Page =================
+app.get("/home", (req, res) => {
+    res.render("home");
 });
 
 //===================Dynamic Loop to render Template.ejs file====================
@@ -871,6 +871,44 @@ app.post("/financeid/:action/:id?", (req, res) => {
 app.get('/calculator', (req, res) => {
     res.render('calculator');
 });
+
+//=============================Login===========================================
+app.get("/", (req, res) => {
+    res.render("login", { errorMessage: null });
+});
+
+// ======================= Handle Login =================
+app.post("/login", (req, res) => {
+    const { username, password } = req.body;
+
+    const query = "SELECT * FROM tblusers WHERE UserName = ? AND Password = ?";
+    connection.query(query, [username, password], (err, results) => {
+        if (err) {
+            console.error("Error querying the database:", err);
+            return res.status(500).send("Internal Server Error");
+        }
+
+        if (results.length > 0) {
+            // Successful login, redirect to the home page
+            res.redirect("/home");
+        } else {
+            // Login failed, show error message
+            res.render("login", { errorMessage: "Invalid username or password." });
+        }
+    });
+});
+
+//=======================================Logout===============================
+
+// Route to render the login page
+app.get('/login', (req, res) => {
+    res.render('login'); // Assumes you have a login.ejs file in your views directory
+});
+
+app.get('/logout', (req, res) => {
+    res.redirect('/login'); // Redirect to login page
+});
+
 
 //================Git Commands =================
 //git clone link to the repository

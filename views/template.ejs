@@ -16,7 +16,7 @@
     <!-- Header and Search Container -->
     <div class="d-flex justify-content-between align-items-center mb-3">
         <h1 class="text-center" style="color: #607D8B;"><%= title %></h1>
-        <a href="/" class="btnEdit btn-primary">Home</a>
+        <a href="/home" class="btnEdit btn-primary">Home</a>
         <a href="/dashboard" class="btnEdit btn-info">Dashboard</a>        
         <input type="text" id="searchBox" class="form-control w-25" placeholder="Search...">        
     </div>   
@@ -61,6 +61,22 @@
                                     style="color: #388E3C; font-weight: bold;"
                                 <% } else if (key === 'SellPrice') { %>
                                     style="color: #E91E63; font-weight: bold;"
+                                <% } else if (key === 'Trade_Year') { %>
+                                    style="color: #64B5F6; font-weight: bold;"
+                                <% } else if (key === 'Trade_Month') { %>
+                                    style="color: #2196F3; font-weight: bold;"
+                                <% } else if (key === 'bal_payment' && value > 0) { %>
+                                    style="color: #81C784; font-weight: bold;"
+                                <% } else if (key === 'bal_payment' && value < 0) { %>
+                                    style="color: #EF5350; font-weight: bold;"
+                                <% } else if (key === 'Net_Profit' && value > 0) { %>
+                                    style="color: #81C784; font-weight: bold;"
+                                <% } else if (key === 'Net_Profit' && value < 0) { %>
+                                    style="color: #EF5350; font-weight: bold;"
+                                <% } else if (key === 'profit' && value > 0) { %>
+                                    style="color: #81C784; font-weight: bold;"
+                                <% } else if (key === 'profit' && value < 0) { %>
+                                    style="color: #EF5350; font-weight: bold;"
                                 <% } else if (key === 'ApptLocation' && value === 'Trades') { %>
                                     style="color: #E91E63; font-weight: bold;"
                                 <% } else if (key === 'ApptLocation' && value === 'Finance') { %>
