@@ -43,6 +43,10 @@ app.listen(port, () => {
 });
 
 // //  =============================================
+// Redirect root route to login page
+app.get('/', (req, res) => {
+    res.redirect('/login');
+});
 
 // ======================= Home Page =================
 app.get("/home", (req, res) => {
@@ -873,38 +877,35 @@ app.get('/calculator', (req, res) => {
 });
 
 //=============================Login===========================================
-app.get("/", (req, res) => {
-    res.render("login", { errorMessage: null });
+app.get('/login', (req, res) => {
+    res.render('login', { errorMessage: null });
 });
 
 // ======================= Handle Login =================
-app.post("/login", (req, res) => {
+app.post('/login', (req, res) => {
     const { username, password } = req.body;
 
-    const query = "SELECT * FROM tblusers WHERE UserName = ? AND Password = ?";
+    const query = 'SELECT * FROM tblusers WHERE UserName = ? AND Password = ?';
     connection.query(query, [username, password], (err, results) => {
         if (err) {
-            console.error("Error querying the database:", err);
-            return res.status(500).send("Internal Server Error");
+            console.error('Database error:', err);
+            return res.status(500).send('Internal Server Error');
         }
 
         if (results.length > 0) {
-            // Successful login, redirect to the home page
-            res.redirect("/home");
+            // Successful login, redirect to home page
+            res.redirect('/home');
         } else {
-            // Login failed, show error message
-            res.render("login", { errorMessage: "Invalid username or password." });
+            // Invalid credentials, show login page with an error message
+            res.render('login', { errorMessage: 'Invalid username or password' });
         }
     });
 });
 
+
 //=======================================Logout===============================
 
 // Route to render the login page
-app.get('/login', (req, res) => {
-    res.render('login'); // Assumes you have a login.ejs file in your views directory
-});
-
 app.get('/logout', (req, res) => {
     res.redirect('/login'); // Redirect to login page
 });
