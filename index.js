@@ -910,6 +910,82 @@ app.get('/logout', (req, res) => {
     res.redirect('/login'); // Redirect to login page
 });
 
+//===================================Password==================================
+// Render document table with Insert and Edit actions
+app.get("/password", (req, res) => {   
+    
+    const query = "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain ORDER BY WebsiteID DESC";   
+
+    connection.query(query, (err, database) => {
+        if (err) return res.status(500).send("Internal Server Error");
+
+        res.render("password", { database });
+    });
+        
+});
+
+// Route to render Insert/Edit form
+app.get("/password/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+
+    if (action === "edit" && id) {
+        // Fetch the specific record for editing
+        const query = "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain WHERE WebsiteID = ?";
+        connection.query(query, [id], (err, database) => {
+            if (err) {
+                console.error("Error fetching data for edit:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+
+            if (database.length > 0) {
+                const data = database[0];               
+
+                res.render("password_form", { action, data });
+            } else {
+                res.status(404).send("Record not found.");
+            }
+        });
+    } else if (action === "insert") {
+        res.render("password_form", { action, data: {} });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
+
+// Route to handle Insert/Update logic
+app.post("/password/:action/:id?", (req, res) => {
+    const { action, id } = req.params;
+    const { WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 } = req.body;
+
+    if (action === "insert") {
+        // Insert new record
+        const query = `INSERT INTO tblWebsiteMain (WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const values = [WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2];
+
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error inserting data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/password");
+        });
+    } else if (action === "edit" && id) {
+        // Update existing record
+        const query = `UPDATE tblWebsiteMain SET WebsiteName = ?, UserName = ?, Password = ?, LinkedEMail = ?, LinkedMobile = ?, Note1 = ?, Note2 = ? WHERE WebsiteID = ?`;
+        const values = [WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2, id];
+
+        connection.query(query, values, (err) => {
+            if (err) {
+                console.error("Error updating data:", err);
+                return res.status(500).send("Internal Server Error");
+            }
+            res.redirect("/password");
+        });
+    } else {
+        res.status(400).send("Invalid action.");
+    }
+});
+
 
 //================Git Commands =================
 //git clone link to the repository
