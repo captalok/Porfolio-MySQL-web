@@ -914,7 +914,7 @@ app.get('/logout', (req, res) => {
 // Render document table with Insert and Edit actions
 app.get("/password", (req, res) => {   
     
-    const query = "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain ORDER BY WebsiteID DESC";   
+    const query = "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEmail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain ORDER BY WebsiteID DESC";   
 
     connection.query(query, (err, database) => {
         if (err) return res.status(500).send("Internal Server Error");
@@ -930,7 +930,7 @@ app.get("/password/:action/:id?", (req, res) => {
 
     if (action === "edit" && id) {
         // Fetch the specific record for editing
-        const query = "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain WHERE WebsiteID = ?";
+        const query = "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEmail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain WHERE WebsiteID = ?";
         connection.query(query, [id], (err, database) => {
             if (err) {
                 console.error("Error fetching data for edit:", err);
@@ -955,12 +955,12 @@ app.get("/password/:action/:id?", (req, res) => {
 // Route to handle Insert/Update logic
 app.post("/password/:action/:id?", (req, res) => {
     const { action, id } = req.params;
-    const { WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 } = req.body;
+    const { WebsiteName, UserName, Password, LinkedEmail, LinkedMobile, Note1, Note2 } = req.body;
 
     if (action === "insert") {
         // Insert new record
-        const query = `INSERT INTO tblWebsiteMain (WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2) VALUES (?, ?, ?, ?, ?, ?, ?)`;
-        const values = [WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2];
+        const query = `INSERT INTO tblWebsiteMain (WebsiteName, UserName, Password, LinkedEmail, LinkedMobile, Note1, Note2) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+        const values = [WebsiteName, UserName, Password, LinkedEmail, LinkedMobile, Note1, Note2];
 
         connection.query(query, values, (err) => {
             if (err) {
@@ -971,8 +971,8 @@ app.post("/password/:action/:id?", (req, res) => {
         });
     } else if (action === "edit" && id) {
         // Update existing record
-        const query = `UPDATE tblWebsiteMain SET WebsiteName = ?, UserName = ?, Password = ?, LinkedEMail = ?, LinkedMobile = ?, Note1 = ?, Note2 = ? WHERE WebsiteID = ?`;
-        const values = [WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2, id];
+        const query = `UPDATE tblWebsiteMain SET WebsiteName = ?, UserName = ?, Password = ?, LinkedEmail = ?, LinkedMobile = ?, Note1 = ?, Note2 = ? WHERE WebsiteID = ?`;
+        const values = [WebsiteName, UserName, Password, LinkedEmail, LinkedMobile, Note1, Note2, id];
 
         connection.query(query, values, (err) => {
             if (err) {
