@@ -49,6 +49,8 @@
                                     style="color: #FFB74D; font-weight: bold;"
                                 <% } else if (key === 'Narration') { %>
                                     style="color: #2196F3; font-weight: bold;"
+                                <% } else if (key === 'run_pips') { %>
+                                    style="color: #2196F3; font-weight: bold;"
                                 <% } else if (key === 'ApptSubject') { %>
                                     style="color: #64B5F6; font-weight: bold;"
                                 <% } else if (key === 'ApptNotes') { %>
@@ -57,6 +59,8 @@
                                     style="color: #EF5350; font-weight: bold;"
                                 <% } else if (key === 'run_deposit') { %>
                                     style="color: #FFCA28; font-weight: bold;"
+                                <% } else if (key === 'run_profit') { %>
+                                    style="color: #EF5350; font-weight: bold;"
                                 <% } else if (key === 'BuyPrice') { %>
                                     style="color: #388E3C; font-weight: bold;"
                                 <% } else if (key === 'SellPrice') { %>
@@ -84,6 +88,10 @@
                                 <% } else if (key === 'GrossProfit' && value > 0) { %>
                                     style="color: #81C784; font-weight: bold;"
                                 <% } else if (key === 'GrossProfit' && value < 0) { %>
+                                    style="color: #EF5350; font-weight: bold;"
+                                <% } else if (key === 'sum_pips' && value > 0) { %>
+                                    style="color: #81C784; font-weight: bold;"
+                                <% } else if (key === 'sum_pips' && value < 0) { %>
                                     style="color: #EF5350; font-weight: bold;"
                                 <% } else if (key === 'DepositWithdrawal' && value > 0) { %>
                                     style="color: #E91E63; font-weight: bold;"
