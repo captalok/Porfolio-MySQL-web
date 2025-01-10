@@ -787,7 +787,7 @@ app.post("/finance/:action/:id?", (req, res) => {
 
 
 
-//===============================Finance ID Generate=======================================
+//===============================Finance ID===============================
 // Render financeid table with Insert and Edit actions
 app.get("/financeid", (req, res) => {
     const query = "SELECT VoucherID, VoucherDate, fVoucherType From vouchert ORDER BY VoucherID DESC";
