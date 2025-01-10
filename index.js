@@ -75,6 +75,12 @@ app.get("/user/:page", (req, res) => {
 
         profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" },
         liabilities: { query: "SELECT * FROM liability_entry", title: "Liabilities" },
+
+        day_trade: { query: "SELECT * FROM day_trade ORDER BY Day DESC", title: "Day Trades" },
+
+        month_trade: { query: "SELECT * FROM month_trade ORDER BY Month DESC", title: "Month Trades" },
+
+        year_trade: { query: "SELECT * FROM year_trade ORDER BY Year DESC", title: "Year Trades" },
         
         passwords: { query: "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain ORDER BY WebsiteID DESC", title: "Passwords" }
     };
@@ -91,6 +97,9 @@ app.get("/user/:page", (req, res) => {
                     if (row.ApptStart) row.ApptStart = formatDate(row.ApptStart);
                     if (row.VoucherDate) row.VoucherDate = formatDate(row.VoucherDate);
                     if (row.BuyDate) row.BuyDate = formatDate(row.BuyDate);
+                    if (row.Day) row.Day = formatDate(row.Day);
+                    if (row.Month) row.Month = formatDate(row.Month);
+                    if (row.Year) row.Year = formatDate(row.Year);
                 });               
 
                 // Render the single template file and pass data
