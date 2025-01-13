@@ -32,6 +32,7 @@ document.getElementById('calculate').addEventListener('click', () => {
 
 // Add event listener for the Reset button
 document.getElementById('reset').addEventListener('click', () => {
+    const buyQty1 = document.getElementById("buyQty1");
     // Loop through all input fields and reset their values to 0 or empty
     for (let i = 1; i <= 10; i++) {
         document.getElementById(`buyQty${i}`).value = '';
@@ -48,5 +49,7 @@ document.getElementById('reset').addEventListener('click', () => {
     document.getElementById('averageBuyValue').value = '';
     document.getElementById('averageSellValue').value = '';
     document.getElementById('totalProfit').value = '';
+
+    buyQty1.focus();
 });
 
