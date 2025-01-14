@@ -66,8 +66,8 @@
                 datasets: [{
                     label: 'Liabilities',
                     data: results.liabilities.map(item => item.AmtBal),
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: '#D32F2F',
+                    borderColor: '#D32F2F',
                     borderWidth: 2,
                     fill: false
                 }]
@@ -91,15 +91,15 @@
                     {
                         label: 'Yearly Profit',
                         data: results.profitLoss.map(item => item.Profit),
-                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: '#388E3C',
+                        borderColor: '#388E3C',
                         borderWidth: 1
                     },
                     {
                         label: 'Yearly Loss',
                         data: results.profitLoss.map(item => item.Loss), // Y-axis data
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red color for Loss
-                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: '#FFB74D', // Red color for Loss
+                        borderColor: '#FFB74D',
                         borderWidth: 1
                     }
                 ]
@@ -128,7 +128,8 @@
                 datasets: [{
                     label: 'Monthly Profit',
                     data: results.monthlyTrades.map(item => item.profit),
-                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: '#81C784',
+                    borderColor: '#81C784',
                     borderWidth: 2,
                     fill: false
                 }]
@@ -152,15 +153,15 @@
                     {
                         label: 'Yearly Profit',
                         data: results.yearlyTrades.map(item => item.profit),
-                        backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                        borderColor: 'rgba(153, 102, 255, 1)',
+                        backgroundColor: '#26A69A',
+                        borderColor: '#26A69A',
                         borderWidth: 1
                     },
                     {
                         label: 'Yearly Deposit',
                         data: results.yearlyTrades.map(item => item.sDepositWithdrawal), // Y-axis data
-                        backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red color for Loss
-                        borderColor: 'rgba(255, 99, 132, 1)',
+                        backgroundColor: '#FF7043', // Red color for Loss
+                        borderColor: '#FF7043',
                         borderWidth: 1
                     }
                 ]
@@ -188,8 +189,8 @@
                 datasets: [{
                     label: 'Expenses',
                     data: results.expenses.map(item => item.amt_spent),
-                    backgroundColor: 'rgba(255, 99, 132, 0.6)', // Red color for Loss
-                    borderColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: '#64B5F6', // Red color for Loss
+                    borderColor: '#64B5F6',
                     borderWidth: 2,
                     fill: false
                 }]
@@ -212,8 +213,8 @@
                 datasets: [{
                     label: 'Monthly Expenses',
                     data: results.monthlyExpenses.map(item => item.Expenses),
-                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
-                    borderColor: 'rgba(153, 102, 255, 1)',
+                    backgroundColor: '#FFCA28',
+                    borderColor: '#FFCA28',
                     borderWidth: 2,
                     fill: false
                 }]
