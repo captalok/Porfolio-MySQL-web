@@ -1,121 +1,168 @@
-// // ================ BASIC SETUP =================
+// ==================== BASIC SETUP ====================
+const express = require("express");
+const session = require("express-session"); // Import express-session
+const { v4: uuidv4 } = require("uuid");
+const methodOverride = require("method-override");
+const path = require("path");
+const mysql = require("mysql2");
 
-let express = require ("express");
 const app = express();
 const port = 8080;
-const {v4 : uuidv4} = require ("uuid");
-const methodOverride = require ("method-override");
-const path = require("path");
 
-// new additions
-const mysql = require ("mysql2");
-// connection to database
+// Database connection
 const connection = mysql.createConnection({
-    host : "localhost",
-    user : "root",
-    database : "portfoliomysql",
-    password : "&&Alok&&24"
+    host: "localhost",
+    user: "root",
+    database: "portfoliomysql",
+    password: "&&Alok&&24",
 });
 
-// Add the formatDate function here
+// Middleware
+app.use(methodOverride("_method"));
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, "public")));
+
+// View Engine
+app.set("view engine", "ejs");
+app.set("views", path.join(__dirname, "views"));
+
+// ==================== SESSION SETUP ====================
+app.use(
+    session({
+        secret: uuidv4(), // Generate a unique secret key
+        resave: false, // Do not save session if not modified
+        saveUninitialized: false, // Do not create session until something stored
+        cookie: { secure: false, maxAge: 1000 * 60 * 60 }, // 1-hour expiration
+    })
+);
+
+// ==================== HELPER FUNCTION ====================
 function formatDate(date) {
     if (!date) return '';
     const d = new Date(date);
     const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
+    const month = String(d.getMonth() + 1).padStart(2, '0');
     const day = String(d.getDate()).padStart(2, '0');
     return `${year}-${month}-${day}`;
 }
 
-app.use(methodOverride("_method"));
+// ==================== AUTH MIDDLEWARE ====================
+function isAuthenticated(req, res, next) {
+    if (req.session && req.session.user) {
+      // User is authenticated
+      return next();
+    } else {
+      // User is not authenticated; redirect to login page
+      res.redirect('/login');
+    }
+  }
+  
 
-app.use(express.urlencoded({extended : true}));
-
-app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views"));
-
-app.set(express.static(path.join(__dirname, "public")));
-app.use(express.static('public'));
-
-
-app.listen(port, () => {
-    console.log("App is listening on port : 8080")
+// ==================== ROUTES ====================
+// Redirect root to login
+app.get("/", (req, res) => {
+    res.redirect("/login");
 });
 
-// //  =============================================
-// Redirect root route to login page
-app.get('/', (req, res) => {
-    res.redirect('/login');
+// Login Page
+app.get("/login", (req, res) => {
+    if (req.session.isAuthenticated) {
+        return res.redirect("/home");
+    }
+    res.render("login", { errorMessage: null });
 });
 
-// ======================= Home Page =================
-app.get("/home", (req, res) => {
-    res.render("home");
-});
+// Handle Login
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    const query = 'SELECT * FROM tblusers WHERE UserName = ? AND Password = ?';
+    connection.query(query, [username, password], (err, results) => {
+      if (err) {
+        console.error('Database error:', err);
+        return res.status(500).send('Internal Server Error');
+      }
+  
+      if (results.length > 0) {
+        req.session.user = { username: results[0].UserName }; // Set user in session
+        res.redirect('/home');
+      } else {
+        res.render('login', { errorMessage: 'Invalid username or password' });
+      }
+    });
+}); 
+  
 
-//===================Dynamic Loop to render Template.ejs file====================
-app.get("/user/:page", (req, res) => {
+// Logout
+app.get('/logout', (req, res) => {
+    req.session.destroy((err) => {
+      if (err) {
+        console.error('Error destroying session:', err);
+        return res.status(500).send('Internal Server Error');
+      }
+      res.redirect('/login');
+    });
+});
+  
+
+// Home Page (Protected Route)
+app.get("/home", isAuthenticated, (req, res) => {
+    res.render("home", { username: req.session.user.username });
+});
+  
+
+// Dynamic Loop to render templates (Protected Route)
+app.get("/user/:page", isAuthenticated, (req, res) => {
     const { page } = req.params;
 
-    // Map of pages to their queries and titles
     const pageMap = {
         calendar: { query: "SELECT ApptID, ApptSubject, ApptLocation, ApptStart, ApptNotes FROM tblAppointments ORDER BY ApptStart DESC", title: "Calendar Database" },
-
         expenses: { query: "SELECT VoucherDate, AccountName, AccountType, DebitAmount, CreditAmount, Narration from run_expenses_entry", title: "Expenses" },
-
         all_trades: { query: "SELECT * from daily_trades", title: "All Trades" },
-
         daily_consolidated: { query: "SELECT * from daily_consolidated", title: "Daily Trades" },
-
         demat: { query: "SELECT BuyDate, sum_qty, sum_pips, sum_profit, sum_deposit, sum_brokerage, run_demat, run_deposit, run_pips, run_brokerage FROM demat_holding", title: "Demat" },
-
         mly_trades: { query: "SELECT Trade_year,Trade_Month, profit, sBrokerage, sPips, sDepositWithdrawal from mly_trades", title: "Monthly Trades" },
-
         yearly_trades: { query: "SELECT * from yearly_trades", title: "Yearly Trades" },
-
         profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" },
         liabilities: { query: "SELECT * FROM liability_entry", title: "Liabilities" },
-
         day_trade: { query: "SELECT * FROM day_trade ORDER BY Day DESC", title: "Day Trades" },
-
         month_trade: { query: "SELECT * FROM month_trade ORDER BY Month DESC", title: "Month Trades" },
-
         year_trade: { query: "SELECT * FROM year_trade ORDER BY Year DESC", title: "Year Trades" },
-        
         passwords: { query: "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEMail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain ORDER BY WebsiteID DESC", title: "Passwords" }
     };
 
     const pageDetails = pageMap[page];
 
     if (pageDetails) {
-        try {
-            connection.query(pageDetails.query, (err, database) => {
-                if (err) throw err;
+        connection.query(pageDetails.query, (err, database) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).send("Internal Server Error");
+            }
 
-                // Format Date for all rows
-                database.forEach(row => {
-                    if (row.ApptStart) row.ApptStart = formatDate(row.ApptStart);
-                    if (row.VoucherDate) row.VoucherDate = formatDate(row.VoucherDate);
-                    if (row.BuyDate) row.BuyDate = formatDate(row.BuyDate);
-                    if (row.Day) row.Day = formatDate(row.Day);
-                    if (row.Month) row.Month = formatDate(row.Month);
-                    if (row.Year) row.Year = formatDate(row.Year);
-                });               
-
-                // Render the single template file and pass data
-                res.render("template.ejs", { database, title: pageDetails.title });
+            database.forEach(row => {
+                if (row.ApptStart) row.ApptStart = formatDate(row.ApptStart);
+                if (row.VoucherDate) row.VoucherDate = formatDate(row.VoucherDate);
+                if (row.BuyDate) row.BuyDate = formatDate(row.BuyDate);
+                if (row.Day) row.Day = formatDate(row.Day);
+                if (row.Month) row.Month = formatDate(row.Month);
+                if (row.Year) row.Year = formatDate(row.Year);
             });
-        } catch (err) {
-            console.log(err);
-            res.status(500).send("Internal Server Error");
-        }
+
+            res.render("template.ejs", { database, title: pageDetails.title });
+        });
     } else {
         res.status(404).send("Page Not Found");
     }
 });
 
+// ==================== START SERVER ====================
+app.listen(port, () => {
+    console.log(`App is listening on port: ${port}`);
+});
+
+
 // ======================= Dashboard =================
-app.get("/dashboard", (req, res) => {
+app.get("/dashboard", isAuthenticated, (req, res) => {
     try {
         // Fetch required data for charts
         const queries = {
@@ -166,7 +213,7 @@ const formatDateTime = (dateTime) => {
 };
 //=========================Calendar ========================================
 // Render calendar table with Insert and Edit actions
-app.get("/calendar", (req, res) => {
+app.get("/calendar", isAuthenticated, (req, res) => {
     const query = "SELECT ApptID, ApptSubject, ApptLocation, ApptStart, ApptEnd, ApptNotes, Priority FROM tblAppointments ORDER BY ApptStart DESC";
 
     connection.query(query, (err, database) => {
@@ -183,7 +230,7 @@ app.get("/calendar", (req, res) => {
 });
 
 // Route to render Insert/Edit form
-app.get("/calendar/:action/:id?", (req, res) => {
+app.get("/calendar/:action/:id?", isAuthenticated,(req, res) => {
     const { action, id } = req.params;
 
     if (action === "edit" && id) {
@@ -250,7 +297,7 @@ app.post("/calendar/:action/:id?", (req, res) => {
 
 //===============================Documents=========================================
 // Render document table with Insert and Edit actions
-app.get("/document", (req, res) => {   
+app.get("/document", isAuthenticated, (req, res) => {   
     
     const query = "SELECT DocID, DocUserName, DocName, DocPath, DocText FROM DocT JOIN DocUserT ON DocT.DocUserID = DocUserT.DocUserID ORDER BY DocID DESC";   
 
@@ -265,7 +312,7 @@ app.get("/document", (req, res) => {
 const fs = require("fs");
 
 // Route to handle "Open" action
-app.get("/document/open/:id", (req, res) => {
+app.get("/document/open/:id", isAuthenticated, (req, res) => {
     const { id } = req.params;
 
     const query = "SELECT DocPath FROM DocT WHERE DocID = ?";
@@ -302,7 +349,7 @@ app.get("/document/open/:id", (req, res) => {
 
 
 // Route to render Insert/Edit form with combo box
-app.get("/document/:action/:id?", (req, res) => {
+app.get("/document/:action/:id?", isAuthenticated, (req, res) => {
     const { action, id } = req.params;
 
     const comboQuery = "SELECT DocUserID, DocUserName FROM DocUserT";
@@ -375,7 +422,7 @@ app.post("/document/:action/:id?", (req, res) => {
 
 //===============================Trades=========================================
 // Render trade table with Insert and Edit actions
-app.get("/trade", (req, res) => {
+app.get("/trade", isAuthenticated, (req, res) => {
     const query = "SELECT tradelinet.TradeLineID, tradelinet.TradeID, tradet.BuyDate, tradetypet.TradeType, tradelinet.BuyQty, tradelinet.BuyPrice, tradelinet.SellPrice, tradelinet.Brokerage,tradelinet.DepositWithdrawal, (SellPrice * BuyQty)-(BuyPrice * BuyQty) - Brokerage AS GrossProfit, SellPrice - BuyPrice AS Pips, tradelinet.SellDate, tradelinet.Note FROM tradelinet INNER JOIN tradet ON tradelinet.TradeID = tradet.TradeID JOIN brokert ON tradelinet.BrokerID = brokert.BrokerID JOIN tradetypet ON tradelinet.TradeTypeID = tradetypet.TradeTypeID JOIN scripnamet ON tradelinet.ScripID = scripnamet.ScripID ORDER BY tradelinet.TradeID DESC";
 
     connection.query(query, (err, database) => {
@@ -391,7 +438,7 @@ app.get("/trade", (req, res) => {
     });
 });
 
-app.get("/trade/:action/:id?", (req, res) => {
+app.get("/trade/:action/:id?", isAuthenticated, (req, res) => {
     const { action, id } = req.params;
 
     const brokerQuery = "SELECT BrokerID, BrokerName FROM brokert";
@@ -520,7 +567,7 @@ app.post("/trade/:action/:id?", (req, res) => {
 
 //===============================Trade ID Generate=======================================
 // Render tradeid table with Insert and Edit actions
-app.get("/tradeid", (req, res) => {
+app.get("/tradeid", isAuthenticated, (req, res) => {
     const query = "SELECT TradeID, BuyDate From tradet ORDER BY TradeID DESC";
 
     connection.query(query, (err, database) => {
@@ -536,7 +583,7 @@ app.get("/tradeid", (req, res) => {
 });
 
 // Route to render Insert/Edit form with combo box
-app.get("/tradeid/:action/:id?", (req, res) => {
+app.get("/tradeid/:action/:id?", isAuthenticated, (req, res) => {
     const { action, id } = req.params;
     if (action === "edit" && id) {
         const editQuery = `
@@ -609,7 +656,7 @@ app.post("/tradeid/:action/:id?", (req, res) => {
 
 //===============================Finance=========================================
 // Render trade table with Insert and Edit actions
-app.get("/finance", (req, res) => {
+app.get("/finance", isAuthenticated, (req, res) => {
     const query = "SELECT VoucherLineT.VoucherLineID, VoucherT.VoucherID, VoucherT.VoucherDate, VoucherTypeT.VoucherType, AccountDetailT.AccountName, AccountTypeT.AccountType, VoucherLineT.DebitAmount, VoucherLineT.CreditAmount, VoucherLineT.Narration, VoucherLineT.Notes, VoucherLineT.IsExported FROM VoucherLineT INNER JOIN VoucherT ON VoucherLineT.fVoucherID = VoucherT.VoucherID JOIN VoucherTypeT ON VoucherT.fVoucherType = VoucherTypeT.VoucherTypeID JOIN AccountDetailT ON VoucherLineT.fAccountDetail = AccountDetailT.AccountDetailID JOIN AccountTypeT ON VoucherlineT.fAccountType = AccountTypeT.AccountTypeID ORDER BY VoucherT.VoucherID DESC, VoucherT.VoucherDate";
 
     connection.query(query, (err, database) => {
@@ -624,7 +671,7 @@ app.get("/finance", (req, res) => {
     });
 });
 
-app.get("/finance/:action/:id?", (req, res) => {    
+app.get("/finance/:action/:id?", isAuthenticated, (req, res) => {    
     const { action, id } = req.params;
 
     const accountDetailQuery = "SELECT AccountDetailID, AccountName FROM accountdetailt";
@@ -789,7 +836,7 @@ app.post("/finance/:action/:id?", (req, res) => {
 
 //===============================Finance ID===============================
 // Render financeid table with Insert and Edit actions
-app.get("/financeid", (req, res) => {
+app.get("/financeid", isAuthenticated, (req, res) => {
     const query = "SELECT VoucherID, VoucherDate, fVoucherType From vouchert ORDER BY VoucherID DESC";
 
     connection.query(query, (err, database) => {
@@ -805,7 +852,7 @@ app.get("/financeid", (req, res) => {
 });
 
 // Route to render Insert/Edit form with combo box
-app.get("/financeid/:action/:id?", (req, res) => {
+app.get("/financeid/:action/:id?", isAuthenticated, (req, res) => {
     const { action, id } = req.params;
 
     const voucherTypeQuery = "SELECT VoucherTypeID, VoucherType FROM VoucherTypeT";
@@ -881,47 +928,12 @@ app.post("/financeid/:action/:id?", (req, res) => {
 
 //===============================Calculator===================================
 // Route for the calculator
-app.get('/calculator', (req, res) => {
+app.get('/calculator', isAuthenticated, (req, res) => {
     res.render('calculator');
 });
-
-//=============================Login===========================================
-app.get('/login', (req, res) => {
-    res.render('login', { errorMessage: null });
-});
-
-// ======================= Handle Login =================
-app.post('/login', (req, res) => {
-    const { username, password } = req.body;
-
-    const query = 'SELECT * FROM tblusers WHERE UserName = ? AND Password = ?';
-    connection.query(query, [username, password], (err, results) => {
-        if (err) {
-            console.error('Database error:', err);
-            return res.status(500).send('Internal Server Error');
-        }
-
-        if (results.length > 0) {
-            // Successful login, redirect to home page
-            res.redirect('/home');
-        } else {
-            // Invalid credentials, show login page with an error message
-            res.render('login', { errorMessage: 'Invalid username or password' });
-        }
-    });
-});
-
-
-//=======================================Logout===============================
-
-// Route to render the login page
-app.get('/logout', (req, res) => {
-    res.redirect('/login'); // Redirect to login page
-});
-
 //===================================Password==================================
 // Render document table with Insert and Edit actions
-app.get("/password", (req, res) => {   
+app.get("/password", isAuthenticated, (req, res) => {   
     
     const query = "SELECT WebsiteID, WebsiteName, UserName, Password, LinkedEmail, LinkedMobile, Note1, Note2 FROM tblWebsiteMain ORDER BY WebsiteID DESC";   
 
@@ -934,7 +946,7 @@ app.get("/password", (req, res) => {
 });
 
 // Route to render Insert/Edit form
-app.get("/password/:action/:id?", (req, res) => {
+app.get("/password/:action/:id?", isAuthenticated, (req, res) => {
     const { action, id } = req.params;
 
     if (action === "edit" && id) {
