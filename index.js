@@ -119,7 +119,7 @@ app.get("/user/:page", isAuthenticated, (req, res) => {
         expenses: { query: "SELECT VoucherDate, AccountName, AccountType, DebitAmount, CreditAmount, Narration from run_expenses_entry", title: "Expenses" },
         all_trades: { query: "SELECT * from daily_trades", title: "All Trades" },
         daily_consolidated: { query: "SELECT * from daily_consolidated", title: "Daily Trades" },
-        demat: { query: "SELECT BuyDate, sum_qty, sum_pips, sum_profit, sum_deposit, sum_brokerage, run_demat, run_deposit, run_pips, run_brokerage FROM demat_holding", title: "Demat" },
+        demat: { query: "SELECT BuyDate, sum_qty, sum_pips, sum_profit, sum_deposit, run_demat, run_deposit, run_pips, run_brokerage FROM demat_holding", title: "Demat" },
         mly_trades: { query: "SELECT Trade_year,Trade_Month, profit, sBrokerage, sPips, sDepositWithdrawal from mly_trades", title: "Monthly Trades" },
         yearly_trades: { query: "SELECT * from yearly_trades", title: "Yearly Trades" },
         profit_loss: { query: "SELECT * FROM combined_profit_loss", title: "Profit & Loss" },
