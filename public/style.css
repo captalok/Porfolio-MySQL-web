@@ -206,34 +206,48 @@ a:hover {
     font-weight: bold;
 }
 
-/* Responsive Design */
-@media (max-width: 768px) {
-    h1.text-center {
-        font-size: 2rem;
-    }
-
-    .table, .table th, .table td {
-        font-size: 0.9rem;
-    }
-
-    .container {
-        padding: 10px;
-    }
-}
-
-.action-buttons {
-    display: flex;
-    align-items: center;
-}
-
-.action-buttons a {
-    margin-right: 8px; /* Adjust spacing as needed */
-}
-
-/* Additional styles for logout button */
+/* Positioning of Home Page */
+/* Logout Button Positioning */
 .logout-button {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 10px;
+    right: 10px;
 }
 
+/* Center heading without overlapping the logout button */
+.header-container {
+    position: relative;
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 40px; /* Adds space below the logout button */
+}
+
+/* Optimize Button Layout */
+.buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Dynamic grid */
+    gap: 15px; /* Space between buttons */
+    justify-content: center; /* Centering */
+}
+.buttons form {
+    width: 100%;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .header-container {
+        padding-top: 60px; /* More space for logout button */
+    }
+    .buttons {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .buttons form {
+        width: 90%;
+    }
+    .btnEdit {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+}

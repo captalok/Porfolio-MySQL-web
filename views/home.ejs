@@ -20,81 +20,43 @@
         </form>
     </div>
 
-    <h1 class="text-center">Welcome back, <%= username %>!</h1>
-    
+    <!-- Header -->
+    <div class="header-container">
+        <h1>Welcome back, <%= username %>!</h1>
+    </div>
 
+    <!-- Edit Tables Section -->
     <div class="container mt-4">
-        <h2 class="text-left" style="color: #00695C;">Edit Tables</h2>
+        <h2 style="color: #00695C;">Edit Tables</h2>
         <div class="buttons">
-            <!-- Buttons -->
-            <form method="get" action="/trade">
-                <button type="submit" class="btnEdit btn-outline-success w-100">Trade</button>
-            </form>
-            <form method="get" action="/finance">
-                <button type="submit" class="btnEdit btn-outline-success w-100">Finance</button>
-            </form>
-            <form method="get" action="/calendar">
-                <button type="submit" class="btnEdit btn-outline-success w-100">Calendar</button>
-            </form>
-            <form method="get" action="/password">
-                <button type="submit" class="btnEdit btn-outline-success w-100">Password</button>
-            </form>
-            <form method="get" action="/document">
-                <button type="submit" class="btnEdit btn-outline-success w-100">Document</button>
-            </form>                         
-        </div> 
+            <form method="get" action="/trade"><button type="submit" class="btn btn-outline-success w-100">Trade</button></form>
+            <form method="get" action="/finance"><button type="submit" class="btn btn-outline-success w-100">Finance</button></form>
+            <form method="get" action="/calendar"><button type="submit" class="btn btn-outline-success w-100">Calendar</button></form>
+            <form method="get" action="/password"><button type="submit" class="btn btn-outline-success w-100">Password</button></form>
+            <form method="get" action="/document"><button type="submit" class="btn btn-outline-success w-100">Document</button></form>
+        </div>
     </div>    
 
+    <!-- View Tables Section -->
     <div class="container mt-4">
-        <h2 class="text-left" style="color: #9575CD;">View Tables</h2>
+        <h2 style="color: #9575CD;">View Tables</h2>
         <div class="buttons">
-            <!-- Buttons -->
-            <form method="get" action="/user/calendar">
-                <button type="submit" class="btn btn-outline-success w-100">Calendar</button>
-            </form>
-            <form method="get" action="/user/expenses">
-                <button type="submit" class="btn btn-outline-success w-100">Expenses</button>
-            </form>
-            <form method="get" action="/user/all_trades">
-                <button type="submit" class="btn btn-outline-success w-100">All Trades</button>
-            </form>
-            <form method="get" action="/user/daily_consolidated">
-                <button type="submit" class="btn btn-outline-success w-100">Daily Trades</button>
-            </form>
-            <form method="get" action="/user/demat">
-                <button type="submit" class="btn btn-outline-success w-100">Demat</button>
-            </form>
-            <form method="get" action="/user/mly_trades">
-                <button type="submit" class="btn btn-outline-success w-100">Monthly Trades</button>
-            </form>
-            <form method="get" action="/user/yearly_trades">
-                <button type="submit" class="btn btn-outline-success w-100">Yearly Trades</button>
-            </form>
-            <form method="get" action="/user/profit_loss">
-                <button type="submit" class="btn btn-outline-success w-100">Profit Loss</button>
-            </form>
-            <form method="get" action="/user/liabilities">
-                <button type="submit" class="btn btn-outline-success w-100">Liabilities</button>
-            </form>
-            <form method="get" action="/user/passwords">
-                <button type="submit" class="btn btn-outline-success w-100">Passwords</button>
-            </form>
-            <form method="get" action="/user/day_trade">
-                <button type="submit" class="btn btn-outline-success w-100">Day Trades</button>
-            </form>
-            <form method="get" action="/user/month_trade">
-                <button type="submit" class="btn btn-outline-success w-100">Month Trades</button>
-            </form>
-            <form method="get" action="/user/year_trade">
-                <button type="submit" class="btn btn-outline-success w-100">Year Trades</button>
-            </form>
-            <form method="get" action="/dashboard">
-                <button type="submit" class="btn btn-outline-success w-100">Dashboard</button>
-            </form>
-
-        </div> 
+            <form method="get" action="/user/calendar"><button type="submit" class="btn btn-outline-success w-100">Calendar</button></form>
+            <form method="get" action="/user/expenses"><button type="submit" class="btn btn-outline-success w-100">Expenses</button></form>
+            <form method="get" action="/user/all_trades"><button type="submit" class="btn btn-outline-success w-100">All Trades</button></form>
+            <form method="get" action="/user/daily_consolidated"><button type="submit" class="btn btn-outline-success w-100">Daily Trades</button></form>
+            <form method="get" action="/user/demat"><button type="submit" class="btn btn-outline-success w-100">Demat</button></form>
+            <form method="get" action="/user/mly_trades"><button type="submit" class="btn btn-outline-success w-100">Monthly Trades</button></form>
+            <form method="get" action="/user/yearly_trades"><button type="submit" class="btn btn-outline-success w-100">Yearly Trades</button></form>
+            <form method="get" action="/user/profit_loss"><button type="submit" class="btn btn-outline-success w-100">Profit Loss</button></form>
+            <form method="get" action="/user/liabilities"><button type="submit" class="btn btn-outline-success w-100">Liabilities</button></form>
+            <form method="get" action="/user/passwords"><button type="submit" class="btn btn-outline-success w-100">Passwords</button></form>
+            <form method="get" action="/user/day_trade"><button type="submit" class="btn btn-outline-success w-100">Day Trades</button></form>
+            <form method="get" action="/user/month_trade"><button type="submit" class="btn btn-outline-success w-100">Month Trades</button></form>
+            <form method="get" action="/user/year_trade"><button type="submit" class="btn btn-outline-success w-100">Year Trades</button></form>
+            <form method="get" action="/dashboard"><button type="submit" class="btn btn-outline-success w-100">Dashboard</button></form>
+        </div>
     </div>    
-    
 
 </body>
 </html>
