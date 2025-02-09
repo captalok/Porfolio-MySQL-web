@@ -11,8 +11,8 @@ const port = 8080;
 
 // Database connection
 const connection = mysql.createConnection({
-    host: "localhost",
-    user: "root",
+    host: "192.168.1.7",
+    user: "admin",
     database: "portfoliomysql",
     password: "&&Alok&&24",
 });
@@ -55,8 +55,7 @@ function isAuthenticated(req, res, next) {
       // User is not authenticated; redirect to login page
       res.redirect('/login');
     }
-  }
-  
+  } 
 
 // ==================== ROUTES ====================
 // Redirect root to login
