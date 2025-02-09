@@ -13,16 +13,15 @@
     
 </head>
 <body>
-    <!-- Logout Button -->
-    <div class="logout-button">
-        <form method="get" action="/logout">
-            <button type="submit" class="btn btn-danger">Logout</button>
-        </form>
-    </div>
-
-    <!-- Header -->
-    <div class="header-container">
-        <h1>Welcome back, <%= username %>!</h1>
+    <!-- Header Section -->
+    <div class="container mt-3">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1>Welcome back, <%= username %>!</h1>
+            <!-- Logout Button -->
+            <form method="get" action="/logout">
+                <button type="submit" class="btn btn-outline-danger">Log Out</button>
+            </form>
+        </div>
     </div>
 
     <!-- Edit Tables Section -->
