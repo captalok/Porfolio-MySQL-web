@@ -11,9 +11,22 @@ const port = 8080;
 
 // Database connection
 const hosts = [
+    { host: "localhost", user: "root", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.1", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.2", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.3", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.4", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.5", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.6", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
     { host: "192.168.1.7", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.8", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.9", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.10", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
     { host: "192.168.1.11", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" }, 
-    { host: "192.168.1.12", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" }
+    { host: "192.168.1.12", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.13", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.14", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
+    { host: "192.168.1.15", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" }
 ];
 
 let connection;
@@ -438,7 +451,6 @@ app.post("/document/:action/:id?", isAuthenticated, async (req, res) => {
 });
 
 
-
 //===============================Trades=========================================
 // Render trade table with Insert and Edit actions
 app.get("/trade", isAuthenticated, async (req, res) => {
@@ -585,7 +597,6 @@ app.get("/tradeid", isAuthenticated, async (req, res) => {
         res.status(500).send("Internal Server Error");
     }
 });
-
 
 // Route to render Insert/Edit form with combo box
 app.get("/tradeid/:action/:id?", isAuthenticated, async (req, res) => {
