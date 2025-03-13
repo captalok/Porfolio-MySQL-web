@@ -1,15 +1,20 @@
 // ==================== BASIC SETUP ====================
 const express = require("express");
-const session = require("express-session"); // Import express-session
+const session = require("express-session");
 const { v4: uuidv4 } = require("uuid");
 const methodOverride = require("method-override");
 const path = require("path");
 const mysql = require("mysql2/promise");
+const ip = require("ip"); // Import the ip package
 
 const app = express();
 const port = 8080;
 
-// Database connection
+// Get the local network IP automatically
+const localIP = ip.address();
+console.log(`Detected Server IP: ${localIP}`);
+
+// Database connection details
 const hosts = [
     { host: "localhost", user: "root", database: "portfoliomysql", password: "&&Alok&&24" },
     { host: "192.168.1.1", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" },
@@ -29,9 +34,6 @@ const hosts = [
     { host: "192.168.1.15", user: "admin", database: "portfoliomysql", password: "&&Alok&&24" }
 ];
 
-let connection;
-let currentHostIndex = 0;
-
 async function connectToDatabase() {
     for (let i = 0; i < hosts.length; i++) {
         try {
@@ -45,6 +47,14 @@ async function connectToDatabase() {
     }
     throw new Error("All database connections failed.");
 }
+
+// Start the Express server and listen on all network interfaces
+app.listen(port, "0.0.0.0", () => {
+    console.log(`✅ Server is running on:`);
+    console.log(`➡ Local:   http://localhost:${port}`);
+    console.log(`➡ Network: http://${localIP}:${port}`);
+});
+
 
 // Middleware
 app.use(methodOverride("_method"));
