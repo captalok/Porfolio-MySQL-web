@@ -240,6 +240,50 @@ app.get("/dashboard", isAuthenticated, async (req, res) => {
     }
 });
 
+//=================DynamicChart==================================
+// Get available months for filter
+app.get('/dynamic_expense',isAuthenticated, async (req, res) => {
+    try {
+        const connection = await connectToDatabase();
+        const [months] = await connection.query(`
+            SELECT DISTINCT DATE_FORMAT(VoucherDate, '%Y-%m') AS month 
+            FROM all_dbl_entry 
+            ORDER BY VoucherDate DESC
+        `);
+        console.log("SQL query has loaded");
+        res.render('DynamicExpense', { months: months.map(m => m.month) });
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Get filtered data
+app.get('/dynamic_expense/data', isAuthenticated, async (req, res) => {
+    const selectedMonth = req.query.month;
+    
+    try {
+        const connection = await connectToDatabase();
+        const [results] = await connection.query(`
+            SELECT 
+                AccountName,
+                SUM(DebitAmount) AS DebitAmount,
+                SUM(CreditAmount) AS CreditAmount
+            FROM all_dbl_entry
+            WHERE 
+                AccountName NOT IN ('Bank', 'Cash')
+                AND DATE_FORMAT(VoucherDate, '%Y-%m') = ?
+            GROUP BY AccountName
+        `, [selectedMonth]);
+
+        res.json(results);
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
 
 const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);

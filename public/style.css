@@ -251,3 +251,18 @@ a:hover {
         padding: 8px;
     }
 }
+
+canvas {
+    /* Improves chart sharpness on HD screens */
+    image-rendering: -moz-crisp-edges;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+
+.chart-container {
+    width: 80%;
+    margin: auto;
+    margin-bottom: 50px;
+}
+    
