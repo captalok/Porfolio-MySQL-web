@@ -240,7 +240,7 @@ app.get("/dashboard", isAuthenticated, async (req, res) => {
     }
 });
 
-//=================Dynamic PIE Chart==================================
+//=================Dynamic PIE Chart Expense==================================
 // Get available months for filter
 app.get('/dynamic_pie_expense',isAuthenticated, async (req, res) => {
     try {
@@ -284,7 +284,7 @@ app.get('/dynamic_pie_expense/data', isAuthenticated, async (req, res) => {
     }
 });
 
-//==================Dynamic Bar Chart =================================
+//==================Dynamic Bar Chart Expense=================================
 
 // Get available months
 app.get('/dynamic_bar_expense', isAuthenticated, async (req, res) => {
@@ -320,6 +320,50 @@ app.get('/dynamic_bar_expense/data', isAuthenticated, async (req, res) => {
                 AND DATE_FORMAT(VoucherDate, '%Y-%m') = ?
             GROUP BY AccountName
             ORDER BY AccountName
+        `, [selectedMonth]);
+
+        res.json(results);
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
+//======================Dynamic Bar Chart Trading===========================
+// Get available months
+app.get('/dynamic_bar_trade', isAuthenticated, async (req, res) => {
+    try {
+        const connection = await connectToDatabase();
+        const [months] = await connection.query(`
+            SELECT DISTINCT DATE_FORMAT(BuyDate, '%Y-%m') AS month 
+            FROM dynamic_trade 
+            ORDER BY BuyDate DESC
+        `);
+        res.render('DynamicBarTrade', { months: months.map(m => m.month) });
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Get filtered data
+app.get('/dynamic_bar_trade/data', isAuthenticated, async (req, res) => {
+    const selectedMonth = req.query.month;
+    
+    try {
+        const connection = await connectToDatabase();
+        const [results] = await connection.query(`
+            SELECT 
+                ScripName,
+                SUM(sum_profit) AS SumProfit,
+                SUM(sum_deposit) AS SumDeposit
+            FROM dynamic_trade
+            WHERE                
+                DATE_FORMAT(BuyDate, '%Y-%m') = ?
+            GROUP BY ScripName
+            ORDER BY ScripName
         `, [selectedMonth]);
 
         res.json(results);
