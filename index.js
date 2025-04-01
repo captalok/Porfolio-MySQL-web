@@ -461,6 +461,50 @@ app.get('/dynamic_bar_category/data', async (req, res) => {
     }
 });
 
+//========================Dynamic Bar ScripName Filter========================
+// Get available ScripName
+app.get('/dynamic_bar_scripName', async (req, res) => {
+    try {
+        const connection = await connectToDatabase();
+        const [accounts] = await connection.query(`
+            SELECT DISTINCT ScripName 
+            FROM dynamic_trade
+            WHERE ScripName IN ('NIFTY', 'BANKNIFTY')            
+            ORDER BY ScripName ASC
+        `);
+        res.render('DynamicBarScripName', { accounts: accounts.map(a => a.ScripName) });
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Get filtered data
+app.get('/dynamic_bar_scripName/data', async (req, res) => {
+    const selectedAccount = req.query.account;
+    const connection = await connectToDatabase();
+    try {
+        const [results] = await connection.query(`
+            SELECT 
+                DATE_FORMAT(BuyDate, '%Y-%m') AS month,
+                SUM(sum_profit) AS DebitAmount,
+                SUM(sum_deposit) AS CreditAmount
+            FROM dynamic_trade
+            WHERE 
+                ScripName = ?
+            GROUP BY DATE_FORMAT(BuyDate, '%Y-%m')
+            ORDER BY BuyDate ASC
+        `, [selectedAccount]);
+
+        res.json(results);
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     const year = date.getFullYear();
