@@ -417,6 +417,50 @@ app.get('/dynamic_bar_finance/data', isAuthenticated, async (req, res) => {
     }
 });
 
+//=====================Dynamic Bar Category Filter===========================
+// Get available accounts
+app.get('/dynamic_bar_category', async (req, res) => {
+    try {
+        const connection = await connectToDatabase();
+        const [accounts] = await connection.query(`
+            SELECT DISTINCT AccountName 
+            FROM all_dbl_entry 
+            WHERE AccountName NOT IN ('Bank', 'Cash', 'Sy Dr', 'Hamid FM', 'Card Fee', 'Afz Contr', 'House Purchase', 'SBI Fixed')
+            ORDER BY AccountName ASC
+        `);
+        res.render('DynamicBarCategory', { accounts: accounts.map(a => a.AccountName) });
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Get filtered data
+app.get('/dynamic_bar_category/data', async (req, res) => {
+    const selectedAccount = req.query.account;
+    const connection = await connectToDatabase();
+    try {
+        const [results] = await connection.query(`
+            SELECT 
+                DATE_FORMAT(VoucherDate, '%Y-%m') AS month,
+                SUM(DebitAmount) AS DebitAmount,
+                SUM(CreditAmount) AS CreditAmount
+            FROM all_dbl_entry
+            WHERE 
+                AccountName = ?
+            GROUP BY DATE_FORMAT(VoucherDate, '%Y-%m')
+            ORDER BY VoucherDate ASC
+        `, [selectedAccount]);
+
+        res.json(results);
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     const year = date.getFullYear();
