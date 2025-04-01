@@ -374,6 +374,49 @@ app.get('/dynamic_bar_trade/data', isAuthenticated, async (req, res) => {
     }
 });
 
+//======================Dynamic Bar Finance===========================
+// Get available months
+app.get('/dynamic_bar_finance', isAuthenticated, async (req, res) => {
+    try {
+        const connection = await connectToDatabase();
+        const [months] = await connection.query(`
+            SELECT DISTINCT DATE_FORMAT(Date, '%Y-%m') AS month 
+            FROM budget_excel 
+            ORDER BY Date DESC
+        `);
+        res.render('DynamicBarFinance', { months: months.map(m => m.month) });
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Get filtered data
+app.get('/dynamic_bar_finance/data', isAuthenticated, async (req, res) => {
+    const selectedMonth = req.query.month;
+    
+    try {
+        const connection = await connectToDatabase();
+        const [results] = await connection.query(`
+            SELECT 
+                Category,
+                SUM(Amount) AS SumProfit                
+            FROM budget_excel
+            WHERE                
+                DATE_FORMAT(Date, '%Y-%m') = ?
+            GROUP BY Category
+            ORDER BY Category
+        `, [selectedMonth]);
+
+        res.json(results);
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 const formatDateTime = (dateTime) => {
     const date = new Date(dateTime);
     const year = date.getFullYear();
