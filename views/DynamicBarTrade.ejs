@@ -17,12 +17,15 @@
     </div>   
     
     <!-- Month Filter -->
-    <label for="monthSelect">Select Month:</label>
-    <select id="monthSelect">
-        <% months.forEach(function(month){ %>
-            <option value="<%= month %>"><%= month %></option>
-        <% }); %>
-    </select>
+    <div class="filter-container">
+        <button class="spin-button" id="prevMonth">◀</button>
+        <select id="monthSelect">
+            <% months.forEach(function(month){ %>
+                <option value="<%= month %>"><%= month %></option>
+            <% }); %>
+        </select>
+        <button class="spin-button" id="nextMonth">▶</button>
+    </div>
 
     <!-- Chart Container -->
     <div style="width: 90vw; height: 80vh; margin: auto;">
@@ -31,7 +34,8 @@
 
     <script>
         let tradeBarChart = null;
-        
+        const availableMonths = <%- JSON.stringify(months) %>;
+
         // Initialize Chart
         function initChart(labels, sumProfit, sumDeposit) {
             const ctx = document.getElementById('tradeBarChart').getContext('2d');
@@ -107,7 +111,22 @@
             }
         }
 
-        // Event listener for month selection
+        // Month navigation functions
+        function changeMonth(step) {
+            const currentIndex = availableMonths.indexOf(document.getElementById('monthSelect').value);
+            let newIndex = currentIndex + step;
+            
+            if (newIndex < 0) newIndex = availableMonths.length - 1;
+            if (newIndex >= availableMonths.length) newIndex = 0;
+            
+            const newMonth = availableMonths[newIndex];
+            document.getElementById('monthSelect').value = newMonth;
+            updateChart(newMonth);
+        }
+
+        // Event listeners
+        document.getElementById('prevMonth').addEventListener('click', () => changeMonth(-1));
+        document.getElementById('nextMonth').addEventListener('click', () => changeMonth(1));
         document.getElementById('monthSelect').addEventListener('change', (event) => {
             updateChart(event.target.value);
         });

@@ -265,4 +265,22 @@ canvas {
     margin: auto;
     margin-bottom: 50px;
 }
+
+.filter-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px;
+}
+.spin-button {
+    padding: 8px 16px;
+    font-size: 16px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+.spin-button:hover {
+    background: #e0e0e0;
+}
     
