@@ -786,7 +786,7 @@ app.get("/trade/:action/:id?", isAuthenticated, async (req, res) => {
             // Default values for the form
             const defaultData = {
                 TradeID: nextTradeID, // Auto-populated TradeID
-                BrokerID: brokers[5]?.BrokerID || 1, // Default BrokerID
+                BrokerID: brokers[0]?.BrokerID || 1, // Default BrokerID
                 ScripID: scrips[24]?.ScripID || 1,    // Default ScripID
                 TradeTypeID: types[0]?.TradeTypeID || 1 // Default TradeTypeID
             };
@@ -951,7 +951,7 @@ app.get("/finance", isAuthenticated, async (req, res) => {
         JOIN VoucherTypeT ON VoucherT.fVoucherType = VoucherTypeT.VoucherTypeID 
         JOIN AccountDetailT ON VoucherLineT.fAccountDetail = AccountDetailT.AccountDetailID 
         JOIN AccountTypeT ON VoucherLineT.fAccountType = AccountTypeT.AccountTypeID 
-        ORDER BY VoucherT.VoucherID DESC, VoucherT.VoucherDate`;
+        ORDER BY VoucherT.VoucherDate DESC, VoucherT.VoucherID`;
 
     try {
         const [database] = await connection.execute(query);
