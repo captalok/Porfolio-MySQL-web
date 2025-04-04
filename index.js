@@ -37,9 +37,9 @@ const hosts = [
 async function connectToDatabase() {
     for (let i = 0; i < hosts.length; i++) {
         try {
-            console.log(`Trying to connect to ${hosts[i].host}...`);
+            //console.log(`Trying to connect to ${hosts[i].host}...`);
             const connection = await mysql.createConnection(hosts[i]);
-            console.log(`Connected to MySQL at ${hosts[i].host}`);
+            //console.log(`Connected to MySQL at ${hosts[i].host}`);
             return connection;
         } catch (err) {
             console.error(`Connection to ${hosts[i].host} failed: ${err.message}`);
@@ -215,7 +215,7 @@ app.get("/dashboard", isAuthenticated, async (req, res) => {
             profitLoss: "SELECT Trade_Year, Profit, Loss FROM combined_profit_loss",
             monthlyTrades: "SELECT Trade_Year, profit FROM mly_trades",
             yearlyTrades: "SELECT Trade_Year, profit, sDepositWithdrawal FROM yearly_trades",
-            expenses: "SELECT AccountName, amt_spent FROM sum_account_name WHERE AccountName IN('Household Items', 'Bills', 'Education', 'Telecom', 'Travel', 'GIC Loan', 'Purchases', 'Mess Bill', 'LPG Gas', 'Gifts', 'Food and Drinks', 'Credit Card', 'Shopping Mall', 'Card Fee', 'Entertainment', 'Electricity', 'Spiritual', 'Health', 'Fuel')",
+            expenses: "SELECT AccountName, amt_spent FROM sum_account_name WHERE AccountName IN('Household Items', 'Bills', 'Education', 'Telecom', 'Travel', 'GIC Loan', 'Purchases', 'Mess Bill', 'LPG Gas', 'Gifts', 'Food and Drinks', 'Credit Card', 'Shopping Mall', 'Card Fee', 'Entertainment', 'Electricity', 'Spiritual', 'Health', 'Fuel', 'Mala Expenses', 'Akash Expenses', 'Aryan Expenses', 'Maintenance', 'Grocery')",
             monthlyExpenses: "SELECT Expense_Year, Expenses FROM mly_expenses WHERE Expenses < 10000000",
             liabilities: "SELECT AcctName, AmtBal FROM Demat_Expenses WHERE AcctName IN('Bank', 'Cash', 'Wallet', 'Demat', 'Credit Card')"
         };
@@ -425,7 +425,7 @@ app.get('/dynamic_bar_category', async (req, res) => {
         const [accounts] = await connection.query(`
             SELECT DISTINCT AccountName 
             FROM all_dbl_entry 
-            WHERE AccountName NOT IN ('Bank', 'Cash', 'Sy Dr', 'Hamid FM', 'Card Fee', 'Afz Contr', 'House Purchase', 'SBI Fixed')
+            WHERE AccountName NOT IN ('Bank', 'Cash', 'Sy Dr', 'Card Fee', 'House Purchase')
             ORDER BY AccountName ASC
         `);
         res.render('DynamicBarCategory', { accounts: accounts.map(a => a.AccountName) });
@@ -460,6 +460,102 @@ app.get('/dynamic_bar_category/data', async (req, res) => {
         res.status(500).json({ error: 'Server Error' });
     }
 });
+
+//=====================Dynamic Budget Filter ================================
+// Get available types
+app.get('/budget', async (req, res) => {
+    try {
+        const connection = await connectToDatabase();
+        const [categories] = await connection.query(`
+            SELECT DISTINCT Category 
+            FROM budget_excel
+            WHERE Category IS NOT NULL
+            ORDER BY Category ASC
+        `);
+        res.render('Budget', { categories: categories.map(c => c.Category) });
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+// Get filtered data
+app.get('/budget/data', async (req, res) => {
+    const { period, category } = req.query;
+    let dateFormat, groupBy;
+    const connection = await connectToDatabase();
+
+    switch(period) {
+        case 'yearly': 
+            dateFormat = '%Y';
+            groupBy = 'YEAR(Date)';
+            break;
+        case 'quarterly': 
+            dateFormat = '%Y-Q%q';
+            groupBy = 'YEAR(Date), QUARTER(Date)';
+            break;
+        case 'monthly': 
+            dateFormat = '%Y-%m';
+            groupBy = 'YEAR(Date), MONTH(Date)';
+            break;
+        case 'weekly': 
+            dateFormat = '%x-W%v';
+            groupBy = 'YEARWEEK(Date, 3)'; // ISO week
+            break;
+        default: 
+            dateFormat = '%Y';
+            groupBy = 'YEAR(Date)';
+    }
+
+    try {
+        const [results] = await connection.query(`
+            SELECT 
+                DATE_FORMAT(Date, ?) AS Period,
+                Type,
+                SUM(Amount) AS TotalAmount
+            FROM budget_excel
+            WHERE Category = ?
+            GROUP BY ${groupBy}, Type
+            ORDER BY Date ASC
+        `, [dateFormat, category]);
+
+        // For quarterly data, ensure all quarters are present
+        if (period === 'quarterly') {
+            const yearMap = new Map();
+            results.forEach(row => {
+                const [year] = row.Period.split('-Q');
+                if (!yearMap.has(year)) yearMap.set(year, new Set());
+                yearMap.get(year).add(row.Period);
+            });
+
+            yearMap.forEach((quarters, year) => {
+                for (let q = 1; q <= 4; q++) {
+                    const period = `${year}-Q${q}`;
+                    if (!quarters.has(period)) {
+                        results.push({
+                            Period: period,
+                            Type: 'Income',
+                            TotalAmount: 0
+                        });
+                        results.push({
+                            Period: period,
+                            Type: 'Expenses',
+                            TotalAmount: 0
+                        });
+                    }
+                }
+            });
+        }
+
+        res.json(results.sort((a, b) => a.Period.localeCompare(b.Period)));
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 
 //========================Dynamic Bar ScripName Filter========================
 // Get available ScripName

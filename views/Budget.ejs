@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budget Distribution</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/style.css">
+    
+</head>
+<body>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="text-center">Budget</h1>
+        <a href="/home" class="btn btn-primary">Home</a>                       
+    </div>   
+    
+    <div class="filter-container">
+        <div class="period-buttons">
+            <button class="period-btn active" data-period="yearly">Yearly</button>
+            <!-- button class="period-btn" data-period="quarterly">Quarterly</button -->
+            <button class="period-btn" data-period="monthly">Monthly</button>
+            <button class="period-btn" data-period="weekly">Weekly</button>
+        </div>
+
+        <div class="category-filter">
+            <button id="prevCategory">◀</button>
+            <select id="categorySelect">
+                <% categories.forEach(function(category){ %>
+                    <option value="<%= category %>"><%= category %></option>
+                <% }); %>
+            </select>
+            <button id="nextCategory">▶</button>
+        </div>
+    </div>
+
+    <!-- Chart Container -->
+    <div style="width: 90vw; height: 80vh; margin: auto;">
+        <canvas id="budgetChart"></canvas>
+    </div>
+
+    <script>
+        let budgetChart = null;
+        const categories = <%- JSON.stringify(categories) %>;
+        const COLOR_PALETTE = ['#4CAF50', '#2196F3'];
+        let currentPeriod = 'yearly';
+
+        function initChart(data) {
+            const ctx = document.getElementById('budgetChart').getContext('2d');
+            
+            // Process data for proper quarterly grouping
+            const periods = processPeriods(data, currentPeriod);
+            
+            const typeData = {
+                'Income': periods.map(p => data.find(d => d.Period === p && d.Type === 'Income')?.TotalAmount || 0),
+                'Expenses': periods.map(p => data.find(d => d.Period === p && d.Type === 'Expenses')?.TotalAmount || 0)
+            };
+
+            if (budgetChart) budgetChart.destroy();
+
+            budgetChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: periods,
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: typeData.Income,
+                            backgroundColor: COLOR_PALETTE[0],
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Expenses',
+                            data: typeData.Expenses,
+                            backgroundColor: COLOR_PALETTE[1],
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Time Period' },
+                            stacked: false
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Amount (₹)' },
+                            stacked: false
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'bottom' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => 
+                                    `${context.dataset.label}: ₹${context.raw.toLocaleString()}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function processPeriods(data, periodType) {
+            const allPeriods = [...new Set(data.map(item => item.Period))];
+            
+            if (periodType !== 'quarterly') return allPeriods.sort();
+            
+            // Special handling for quarterly periods
+            const yearMap = new Map();
+            
+            allPeriods.forEach(p => {
+                const [year, quarter] = p.split('-Q');
+                if (!yearMap.has(year)) yearMap.set(year, new Set());
+                yearMap.get(year).add(quarter);
+            });
+
+            const sortedPeriods = [];
+            Array.from(yearMap.keys()).sort().forEach(year => {
+                for (let q = 1; q <= 4; q++) {
+                    const period = `${year}-Q${q}`;
+                    if (allPeriods.includes(period) || data.some(d => d.Period === period)) {
+                        sortedPeriods.push(period);
+                    }
+                }
+            });
+
+            return sortedPeriods;
+        }
+
+        async function updateChart() {
+            const category = document.getElementById('categorySelect').value;
+            try {
+                const response = await fetch(`/budget/data?period=${currentPeriod}&category=${encodeURIComponent(category)}`);
+                const data = await response.json();
+                initChart(data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        // Period button handling
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentPeriod = this.dataset.period;
+                updateChart();
+            });
+        });
+
+        // Category navigation
+        function changeCategory(step) {
+            const currentIndex = categories.indexOf(document.getElementById('categorySelect').value);
+            let newIndex = (currentIndex + step + categories.length) % categories.length;
+            document.getElementById('categorySelect').value = categories[newIndex];
+            updateChart();
+        }
+
+        document.getElementById('prevCategory').addEventListener('click', () => changeCategory(-1));
+        document.getElementById('nextCategory').addEventListener('click', () => changeCategory(1));
+        document.getElementById('categorySelect').addEventListener('change', updateChart);
+
+        // Initial load
+        window.onload = updateChart;
+    </script>
+</body>
+</html>

@@ -283,4 +283,29 @@ canvas {
 .spin-button:hover {
     background: #e0e0e0;
 }
+
+.period-buttons {
+    display: flex;
+    gap: 10px;
+}
+.category-filter {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+button {
+    padding: 8px 16px;
+    cursor: pointer;
+    background: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+button.active {
+    background: #2196F3;
+    color: white;
+}
+select {
+    padding: 8px;
+    min-width: 200px;
+}
     
