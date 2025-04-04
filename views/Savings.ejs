@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Savings Distribution</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/style.css">
+    
+</head>
+<body>
+    
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="text-center">Savings</h1>
+        <a href="/home" class="btn btn-primary">Home</a>                       
+    </div>   
+    
+    <div class="filter-container">
+        <div class="year-filter">
+            <button id="prevYear">◀</button>
+            <select id="yearSelect">
+                <% years.forEach(function(year){ %>
+                    <option value="<%= year %>"><%= year %></option>
+                <% }); %>
+            </select>
+            <button id="nextYear">▶</button>
+        </div>
+    </div>
+
+    <!-- Chart Container -->
+    <div style="width: 90vw; height: 80vh; margin: auto;">
+        <canvas id="savingsChart"></canvas>
+    </div>
+
+    <script>
+        let savingsChart = null;
+        const years = <%- JSON.stringify(years) %>;
+        const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+                           'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        function initChart(data) {
+            const ctx = document.getElementById('savingsChart').getContext('2d');
+            
+            if (savingsChart) savingsChart.destroy();
+
+            savingsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [
+                        {
+                            label: 'Income',
+                            data: prepareData(data, 'Income'),
+                            backgroundColor: '#4CAF50',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Expenses',
+                            data: prepareData(data, 'Expenses'),
+                            backgroundColor: '#F44336',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Savings',
+                            data: prepareData(data, 'Savings'),
+                            backgroundColor: '#2196F3',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: { display: true, text: 'Months' },
+                            stacked: false
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: { display: true, text: 'Amount (₹)' },
+                            stacked: false
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => 
+                                    `${context.dataset.label}: ₹${context.raw.toLocaleString()}`
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function prepareData(rawData, type) {
+            return Array(12).fill(0).map((_, index) => {
+                const monthData = rawData.find(d => 
+                    d.month === index + 1 && d.Type === type
+                );
+                return monthData ? monthData.TotalAmount : 0;
+            });
+        }
+
+        // Fetch data for selected month
+        async function updateChart() {
+            const year = document.getElementById('yearSelect').value;
+            try {
+                const response = await fetch(`/savings/data?year=${year}`);
+                const data = await response.json();
+                initChart(data);
+            } catch (error) {
+                console.error('Error:', error);
+            }
+        }
+
+        function changeYear(step) {
+            const currentIndex = years.indexOf(parseInt(document.getElementById('yearSelect').value));
+            const newIndex = (currentIndex + step + years.length) % years.length;
+            document.getElementById('yearSelect').value = years[newIndex];
+            updateChart();
+        }
+
+        // Event listeners
+        document.getElementById('prevYear').addEventListener('click', () => changeYear(-1));
+        document.getElementById('nextYear').addEventListener('click', () => changeYear(1));
+        document.getElementById('yearSelect').addEventListener('change', updateChart);        
+
+        window.onload = updateChart;
+        
+    </script>
+</body>
+</html>
