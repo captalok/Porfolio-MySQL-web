@@ -215,7 +215,7 @@ app.get("/dashboard", isAuthenticated, async (req, res) => {
             profitLoss: "SELECT Trade_Year, Profit, Loss FROM combined_profit_loss",
             monthlyTrades: "SELECT Trade_Year, profit FROM mly_trades",
             yearlyTrades: "SELECT Trade_Year, profit, sDepositWithdrawal FROM yearly_trades",
-            expenses: "SELECT AccountName, amt_spent FROM sum_account_name WHERE AccountName IN('Household Items', 'Bills', 'Education', 'Telecom', 'Travel', 'GIC Loan', 'Purchases', 'Mess Bill', 'LPG Gas', 'Gifts', 'Food and Drinks', 'Credit Card', 'Shopping Mall', 'Card Fee', 'Entertainment', 'Electricity', 'Spiritual', 'Health', 'Fuel', 'Mala Expenses', 'Akash Expenses', 'Aryan Expenses', 'Maintenance', 'Grocery')",
+            expenses: "SELECT AccountName, amt_spent FROM sum_account_name WHERE AccountName IN('Household Items', 'Bills', 'Education', 'Telecom', 'Travel', 'GIC Loan', 'Purchases', 'Mess Bill', 'LPG Gas', 'Gifts', 'Food and Drinks', 'Credit Card', 'Shopping Mall', 'Card Fee', 'Entertainment', 'Electricity', 'Spiritual', 'Health', 'Fuel', 'Mala Expenses', 'Akash Expenses', 'Aryan Expenses', 'Maintenance', 'Grocery','Fresh')",
             monthlyExpenses: "SELECT Expense_Year, Expenses FROM mly_expenses WHERE Expenses < 10000000",
             liabilities: "SELECT AcctName, AmtBal FROM Demat_Expenses WHERE AcctName IN('Bank', 'Cash', 'Wallet', 'Demat', 'Credit Card')"
         };
@@ -419,7 +419,7 @@ app.get('/dynamic_bar_finance/data', isAuthenticated, async (req, res) => {
 
 //=====================Dynamic Bar Category Filter===========================
 // Get available accounts
-app.get('/dynamic_bar_category', async (req, res) => {
+app.get('/dynamic_bar_category',isAuthenticated, async (req, res) => {
     try {
         const connection = await connectToDatabase();
         const [accounts] = await connection.query(`
@@ -437,7 +437,7 @@ app.get('/dynamic_bar_category', async (req, res) => {
 });
 
 // Get filtered data
-app.get('/dynamic_bar_category/data', async (req, res) => {
+app.get('/dynamic_bar_category/data',isAuthenticated, async (req, res) => {
     const selectedAccount = req.query.account;
     const connection = await connectToDatabase();
     try {
@@ -463,7 +463,7 @@ app.get('/dynamic_bar_category/data', async (req, res) => {
 
 //=====================Dynamic Budget Filter ================================
 // Get available types
-app.get('/budget', async (req, res) => {
+app.get('/budget',isAuthenticated, async (req, res) => {
     try {
         const connection = await connectToDatabase();
         const [categories] = await connection.query(`
@@ -481,7 +481,7 @@ app.get('/budget', async (req, res) => {
 });
 
 // Get filtered data
-app.get('/budget/data', async (req, res) => {
+app.get('/budget/data', isAuthenticated,async (req, res) => {
     const { period, category } = req.query;
     let dateFormat, groupBy;
     const connection = await connectToDatabase();
@@ -557,7 +557,7 @@ app.get('/budget/data', async (req, res) => {
 });
 
 //==========================Savings Bar Chart ===============================
-app.get('/savings', async (req, res) => {
+app.get('/savings',isAuthenticated, async (req, res) => {
     try {
         const connection = await connectToDatabase();
         const [years] = await connection.query(`
@@ -573,7 +573,7 @@ app.get('/savings', async (req, res) => {
     }
 });
 
-app.get('/savings/data', async (req, res) => {
+app.get('/savings/data',isAuthenticated, async (req, res) => {
     const year = req.query.year;
     const connection = await connectToDatabase();
     try {
@@ -599,7 +599,7 @@ app.get('/savings/data', async (req, res) => {
 
 //========================Dynamic Bar ScripName Filter========================
 // Get available ScripName
-app.get('/dynamic_bar_scripName', async (req, res) => {
+app.get('/dynamic_bar_scripName',isAuthenticated, async (req, res) => {
     try {
         const connection = await connectToDatabase();
         const [accounts] = await connection.query(`
@@ -617,7 +617,7 @@ app.get('/dynamic_bar_scripName', async (req, res) => {
 });
 
 // Get filtered data
-app.get('/dynamic_bar_scripName/data', async (req, res) => {
+app.get('/dynamic_bar_scripName/data',isAuthenticated, async (req, res) => {
     const selectedAccount = req.query.account;
     const connection = await connectToDatabase();
     try {
