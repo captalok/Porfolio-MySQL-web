@@ -596,6 +596,46 @@ app.get('/savings/data',isAuthenticated, async (req, res) => {
     }
 });
 
+//=========================Trading Analysis Bar Chart==========================
+app.get('/trading_analysis',isAuthenticated, async (req, res) => {
+    try {
+        const connection = await connectToDatabase();
+        const [years] = await connection.query(`
+            SELECT DISTINCT YEAR(Date) AS year 
+            FROM trading_analysis 
+            ORDER BY year DESC
+        `);
+        res.render('TradingAnalysis', { years: years.map(y => y.year) });
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).send('Server Error');
+    }
+});
+
+app.get('/trading_analysis/data',isAuthenticated, async (req, res) => {
+    const year = req.query.year;
+    const connection = await connectToDatabase();
+    try {
+        const [results] = await connection.query(`
+            SELECT 
+                MONTH(Date) AS month,
+                Type,
+                SUM(Amount) AS TotalAmount
+            FROM trading_analysis
+            WHERE YEAR(Date) = ?
+            GROUP BY MONTH(Date), Type
+            ORDER BY MONTH(Date) ASC
+        `, [year]);
+
+        res.json(results);
+        connection.close();
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Server Error' });
+    }
+});
+
 
 //========================Dynamic Bar ScripName Filter========================
 // Get available ScripName

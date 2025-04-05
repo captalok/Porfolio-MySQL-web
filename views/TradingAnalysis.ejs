@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Savings Distribution</title>
+    <title>Trading Analysis</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/style.css">
@@ -12,7 +12,7 @@
 <body>
     
     <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="text-center">Savings</h1>
+        <h1 class="text-center">Trading Analysis</h1>
         <a href="/home" class="btn btn-primary">Home</a>                       
     </div>   
     
@@ -30,44 +30,44 @@
 
     <!-- Chart Container -->
     <div style="width: 90vw; height: 80vh; margin: auto;">
-        <canvas id="savingsChart"></canvas>
+        <canvas id="tradingAnalysis"></canvas>
     </div>
 
     <script>
-        let savingsChart = null;
+        let tradingAnalysis = null;
         const years = <%- JSON.stringify(years) %>;
         const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
         function initChart(data) {
-            const ctx = document.getElementById('savingsChart').getContext('2d');
+            const ctx = document.getElementById('tradingAnalysis').getContext('2d');
             
-            if (savingsChart) savingsChart.destroy();
+            if (tradingAnalysis) tradingAnalysis.destroy();
 
-            savingsChart = new Chart(ctx, {
+            tradingAnalysis = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: monthLabels,
                     datasets: [
                         {
-                            label: 'Income',
+                            label: 'Sales',
                             data: prepareData(data, 'Income'),
-                            backgroundColor: '#26A69A',
-                            borderColor: '#26A69A',
+                            backgroundColor: '#388E3C',
+                            borderColor: '#388E3C',
                             borderWidth: 1
                         },
                         {
-                            label: 'Expenses',
+                            label: 'Purchases',
                             data: prepareData(data, 'Expenses'),
-                            backgroundColor: '#FF7043',
-                            borderColor: '#FF7043',
+                            backgroundColor: '#D32F2F',
+                            borderColor: '#D32F2F',
                             borderWidth: 1
                         },
                         {
-                            label: 'Savings',
+                            label: 'Options',
                             data: prepareData(data, 'Savings'),
-                            backgroundColor: '#FFCA28',
-                            borderColor: '#FFCA28',
+                            backgroundColor: '#FFB74D',
+                            borderColor: '#FFB74D',
                             borderWidth: 1
                         }
                     ]
@@ -112,7 +112,7 @@
         async function updateChart() {
             const year = document.getElementById('yearSelect').value;
             try {
-                const response = await fetch(`/savings/data?year=${year}`);
+                const response = await fetch(`/trading_analysis/data?year=${year}`);
                 const data = await response.json();
                 initChart(data);
             } catch (error) {
